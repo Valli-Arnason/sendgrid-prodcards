@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Krónan – 3 dálka SendGrid block generator</title>
+  <title>3 column SendGrid block generator</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color:#111; }
     h1 { font-size: 20px; margin: 0 0 6px; }
@@ -32,7 +32,7 @@
 </head>
 <body>
   <h1>3 dálka SendGrid blokkur – generator</h1>
-  <p class="muted">Límdu inn 3 vörutengla + 3 myndatengla. HTML uppfærist sjálfkrafa og er tilbúið til að afrita í SendGrid.</p>
+  <p class="muted">Límdu inn 3 vörutengla + 3 myndatengla. HTML uppfærist sjálfkrafa og er tilbúið til að afrita í "Code block" SendGrid.</p>
 
   <div class="wrap">
     <div class="panel">
@@ -81,13 +81,13 @@
           <strong>Dálkur ${idx+1}</strong>
 
           <label>Vörutengill (href)</label>
-          <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/vara/..." value="${p.href}"/>
+          <input data-k="href" data-i="${idx}" placeholder="https://example/product/..." value="${p.href}"/>
 
           <label>Myndatengill (src)</label>
           <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
 
           <label>Alt text (valfrjálst)</label>
-          <input data-k="alt" data-i="${idx}" placeholder="t.d. Maiskökur" value="${p.alt}"/>
+          <input data-k="alt" data-i="${idx}" placeholder="t.d. Cookies" value="${p.alt}"/>
         </div>
       `;
       inputsEl.appendChild(card);
