@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="is">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Krónan – 3 dálka SendGrid block generator</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color:#111; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .muted { color:#666; font-size: 12px; margin: 0 0 14px; }
+    .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+    .panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
+    .panel h2 { font-size: 16px; margin: 0 0 10px; }
+    label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
+    input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
+    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    button { cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111; background:#111; color:#fff; font-weight:600; }
+    button.ghost { background:#fff; color:#111; }
+    textarea {
+      width:100%; min-height: 300px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
+      white-space: pre; overflow:auto;
+    }
+    .preview {
+      background:#fafafa; padding: 10px; border-radius: 8px;
+      border:1px dashed #ccc; overflow:auto;
+    }
+    .note { font-size:12px; color:#444; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <h1>3 dálka SendGrid blokkur – generator</h1>
+  <p class="muted">Límdu inn 3 vörutengla + 3 myndatengla. HTML uppfærist sjálfkrafa og er tilbúið til að afrita í SendGrid.</p>
+
+  <div class="wrap">
+    <div class="panel">
+      <h2>Inntak</h2>
+
+      <div class="row3" id="inputs"></div>
+
+      <div class="btns">
+        <button class="ghost" id="resetBtn" type="button">Hreinsa</button>
+        <button id="copyBtn" type="button">Afrita HTML</button>
+      </div>
+      <div id="copyStatus" class="note"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div class="preview" id="preview"></div>
+
+      <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+      <textarea id="output" readonly></textarea>
+    </div>
+  </div>
+
+<script>
+  const NUM_COLUMNS = 3;
+
+  const products = Array.from({ length: NUM_COLUMNS }, () => ({
+    href: "",
+    src: "",
+    alt: ""
+  }));
+
+  const inputsEl = document.getElementById("inputs");
+  const outputEl = document.getElementById("output");
+  const previewEl = document.getElementById("preview");
+  const copyBtn = document.getElementById("copyBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const copyStatus = document.getElementById("copyStatus");
+
+  function renderInputs() {
+    inputsEl.innerHTML = "";
+    products.forEach((p, idx) => {
+      const card = document.createElement("div");
+      card.innerHTML = `
+        <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
+          <strong>Dálkur ${idx+1}</strong>
+
+          <label>Vörutengill (href)</label>
+          <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/vara/..." value="${p.href}"/>
+
+          <label>Myndatengill (src)</label>
+          <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
+
+          <label>Alt text (valfrjálst)</label>
+          <input data-k="alt" data-i="${idx}" placeholder="t.d. Maiskökur" value="${p.alt}"/>
+        </div>
+      `;
+      inputsEl.appendChild(card);
+    });
+
+    inputsEl.querySelectorAll("input").forEach(inp => {
+      inp.addEventListener("input", e => {
+        const i = Number(e.target.dataset.i);
+        const k = e.target.dataset.k;
+        products[i][k] = e.target.value.trim();
+        update();
+      });
+    });
+  }
+
+  // YOUR TEMPLATE: kept verbatim except placeholders
+  const TEMPLATE = String.raw`<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Mobile-only overrides (Gmail/Android friendly) */
+  @media only screen and (max-width:640px),
+         only screen and (max-device-width:640px) {
+
+    .responsive-table, [class~="responsive-table"] {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important; /* avoid double padding from wrapper */
+    }
+
+    .column, [class~="column"] {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      margin: 0 auto 20px !important;
+      padding: 0 !important; /* prevent compounding widths */
+    }
+
+    /* Reliable 28px side gutters per card */
+    .mobile-pad, [class~="mobile-pad"] {
+      padding-left: 28px !important;
+      padding-right: 28px !important;
+    }
+
+    .column img, [class~="column"] img {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+      display: block !important;
+      margin: 0 auto !important;
+    }
+  }
+  </style>
+</head>
+
+<body>
+  <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+    <tr>
+      <!-- First Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <!-- Mobile adds 28px L/R here -->
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href1}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt1}}" src="{{src1}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+
+      <!-- Second Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href2}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt2}}" src="{{src2}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+
+      <!-- Third Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href3}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt3}}" src="{{src3}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>`;
+
+  function buildHTML() {
+    let html = TEMPLATE;
+
+    products.forEach((p, idx) => {
+      const n = idx + 1;
+      html = html
+        .replaceAll(`{{href${n}}}`, p.href || "#")
+        .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x604.png?text=Image")
+        .replaceAll(`{{alt${n}}}`, escapeHtml(p.alt || ""));
+    });
+
+    return html.trim();
+  }
+
+  function update() {
+    const html = buildHTML();
+    outputEl.value = html;
+    previewEl.innerHTML = html; // internal use only; SendGrid will use the copied code
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(outputEl.value);
+      copyStatus.textContent = "Afritað! Límdu í SendGrid Code Block.";
+      setTimeout(() => copyStatus.textContent = "", 2000);
+    } catch {
+      copyStatus.textContent = "Tókst ekki að afrita sjálfvirkt — veldu textann og afritaðu handvirkt.";
+    }
+  });
+
+  resetBtn.addEventListener("click", () => {
+    products.forEach(p => { p.href=""; p.src=""; p.alt=""; });
+    renderInputs();
+    update();
+  });
+
+  renderInputs();
+  update();
+</script>
+</body>
+</html>
