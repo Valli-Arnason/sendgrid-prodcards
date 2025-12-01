@@ -2,109 +2,206 @@
 <html lang="is">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3 column SendGrid block generator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SendGrid tools</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color:#111; }
     h1 { font-size: 20px; margin: 0 0 6px; }
     .muted { color:#666; font-size: 12px; margin: 0 0 14px; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .tab-btn {
+      cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid #111;
+      background:#fff; color:#111; font-weight:700; font-size:13px;
+    }
+    .tab-btn.active { background:#111; color:#fff; }
+    .tab { display:none; }
+    .tab.active { display:block; }
+
+    /* Shared layout */
     .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
     .panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
     .panel h2 { font-size: 16px; margin: 0 0 10px; }
     label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
     input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
-    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-    .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
-    button { cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111; background:#111; color:#fff; font-weight:600; }
-    button.ghost { background:#fff; color:#111; }
     textarea {
-      width:100%; min-height: 300px;
+      width:100%; min-height: 280px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
       white-space: pre; overflow:auto;
     }
-    .preview {
-      background:#fafafa; padding: 10px; border-radius: 8px;
-      border:1px dashed #ccc; overflow:auto;
-    }
+    .preview { background:#fafafa; padding: 10px; border-radius: 8px; border:1px dashed #ccc; overflow:auto; }
+    .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    button { cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111; background:#111; color:#fff; font-weight:700; }
+    button.ghost { background:#fff; color:#111; }
     .note { font-size:12px; color:#444; margin-top:8px; }
+
+    /* 3-column input */
+    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+
+    /* UTM controls */
+    .toggle-row { display:flex; align-items:center; gap:8px; margin-top: 6px; }
+    .toggle-row input[type="checkbox"] { width:auto; transform: translateY(1px); }
+    .utm-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top: 8px; }
+    .utm-grid input { font-size:13px; }
+    .small { font-size:12px; color:#555; margin-top:6px; }
+
+    /* Product card preview */
+    .card-shell {
+      margin-top:14px; width:320px; border:1px solid #eee; border-radius:14px; overflow:hidden;
+      box-shadow:0 1px 6px rgba(0,0,0,0.06); background:#fff;
+    }
   </style>
 </head>
 <body>
-  <h1>3 dálka SendGrid blokkur – generator</h1>
-  <p class="muted">Límdu inn 3 vörutengla + 3 myndatengla. HTML uppfærist sjálfkrafa og er tilbúið til að afrita í "Code block" SendGrid.</p>
+  <h1>SendGrid marketing tools</h1>
+  <p class="muted">Two-tools: 3 column block for code view + “Create card” from product url.</p>
 
-  <div class="wrap">
-    <div class="panel">
-      <h2>Inntak</h2>
-
-      <div class="row3" id="inputs"></div>
-
-      <div class="btns">
-        <button class="ghost" id="resetBtn" type="button">Hreinsa</button>
-        <button id="copyBtn" type="button">Afrita HTML</button>
-      </div>
-      <div id="copyStatus" class="note"></div>
-    </div>
-
-    <div class="panel">
-      <h2>Forskoðun</h2>
-      <div class="preview" id="preview"></div>
-
-      <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
-      <textarea id="output" readonly></textarea>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tab-3col">3-column block</button>
+    <button class="tab-btn" data-tab="tab-card">Create card from url</button>
   </div>
 
-<script>
-  const NUM_COLUMNS = 3;
+  <!-- ===================== TAB 1: 3-column generator ===================== -->
+  <section id="tab-3col" class="tab active">
+    <div class="wrap">
+      <div class="panel">
+        <h2>3-column block</h2>
 
-  const products = Array.from({ length: NUM_COLUMNS }, () => ({
-    href: "",
-    src: "",
-    alt: ""
-  }));
-
-  const inputsEl = document.getElementById("inputs");
-  const outputEl = document.getElementById("output");
-  const previewEl = document.getElementById("preview");
-  const copyBtn = document.getElementById("copyBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const copyStatus = document.getElementById("copyStatus");
-
-  function renderInputs() {
-    inputsEl.innerHTML = "";
-    products.forEach((p, idx) => {
-      const card = document.createElement("div");
-      card.innerHTML = `
-        <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
-          <strong>Dálkur ${idx+1}</strong>
-
-          <label>Vörutengill (href)</label>
-          <input data-k="href" data-i="${idx}" placeholder="https://example/product/..." value="${p.href}"/>
-
-          <label>Myndatengill (src)</label>
-          <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
-
-          <label>Alt text (valfrjálst)</label>
-          <input data-k="alt" data-i="${idx}" placeholder="t.d. Cookies" value="${p.alt}"/>
+        <!-- UTM controls -->
+        <div class="toggle-row">
+          <input id="utmToggle3" type="checkbox" checked />
+          <label for="utmToggle3" style="margin:0;">Bæta UTM á vörutengla</label>
         </div>
-      `;
-      inputsEl.appendChild(card);
-    });
+        <div class="utm-grid" id="utmFields3">
+          <div>
+            <label style="margin-top:8px;">utm_source</label>
+            <input id="utmSource3" value="sendgrid" />
+          </div>
+          <div>
+            <label style="margin-top:8px;">utm_medium</label>
+            <input id="utmMedium3" value="email" />
+          </div>
+          <div>
+            <label style="margin-top:8px;">utm_campaign</label>
+            <input id="utmCampaign3" value="marketing_single_send" />
+          </div>
+        </div>
+        <div class="small">Ef slökkt er á þessu, fara tenglar inn óbreyttir.</div>
 
-    inputsEl.querySelectorAll("input").forEach(inp => {
-      inp.addEventListener("input", e => {
-        const i = Number(e.target.dataset.i);
-        const k = e.target.dataset.k;
-        products[i][k] = e.target.value.trim();
-        update();
-      });
-    });
-  }
+        <div class="row3" id="inputs3col" style="margin-top:12px;"></div>
 
-  // YOUR TEMPLATE: kept verbatim except placeholders
-  const TEMPLATE = String.raw`<head>
+        <div class="btns">
+          <button class="ghost" id="resetBtn3col" type="button">Hreinsa</button>
+          <button id="copyBtn3col" type="button">Afrita HTML</button>
+        </div>
+        <div id="copyStatus3col" class="note"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Forskoðun</h2>
+        <div class="preview" id="preview3col"></div>
+
+        <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+        <textarea id="output3col" readonly></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 2: Product card builder ===================== -->
+  <section id="tab-card" class="tab">
+    <div class="wrap">
+      <div class="panel">
+        <h2>Create card from url</h2>
+
+        <label>Product URL (site.com/product/...)</label>
+        <input id="productUrlCard" placeholder="https://site.com/product/1234567" />
+
+        <div class="btns">
+          <button id="createBtnCard" type="button">Create card</button>
+          <button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
+        </div>
+
+        <div id="statusCard" class="note"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Forskoðun</h2>
+        <div id="previewCard"></div>
+
+        <h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
+        <textarea id="outputCard" readonly></textarea>
+      </div>
+    </div>
+  </section>
+
+<script>
+/* ===================== Tabs ===================== */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ===================== TAB 1: 3-column generator ===================== */
+const NUM_COLUMNS = 3;
+
+const products3col = Array.from({ length: NUM_COLUMNS }, () => ({
+  href: "",
+  src: "",
+  alt: ""
+}));
+
+const inputs3colEl = document.getElementById("inputs3col");
+const output3colEl = document.getElementById("output3col");
+const preview3colEl = document.getElementById("preview3col");
+const copyBtn3col = document.getElementById("copyBtn3col");
+const resetBtn3col = document.getElementById("resetBtn3col");
+const copyStatus3col = document.getElementById("copyStatus3col");
+
+const utmToggle3 = document.getElementById("utmToggle3");
+const utmSource3 = document.getElementById("utmSource3");
+const utmMedium3 = document.getElementById("utmMedium3");
+const utmCampaign3 = document.getElementById("utmCampaign3");
+const utmFields3 = document.getElementById("utmFields3");
+
+function renderInputs3col() {
+  inputs3colEl.innerHTML = "";
+  products3col.forEach((p, idx) => {
+    const card = document.createElement("div");
+    card.innerHTML = `
+      <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
+        <strong>Dálkur ${idx+1}</strong>
+
+        <label>Vörutengill (href)</label>
+        <input data-k="href" data-i="${idx}" placeholder="https://site.com/product/..." value="${p.href}"/>
+
+        <label>Myndatengill (src)</label>
+        <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
+
+        <label>Alt text (valfrjálst)</label>
+        <input data-k="alt" data-i="${idx}" placeholder="t.d. Maiskökur" value="${p.alt}"/>
+      </div>
+    `;
+    inputs3colEl.appendChild(card);
+  });
+
+  inputs3colEl.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const i = Number(e.target.dataset.i);
+      const k = e.target.dataset.k;
+      products3col[i][k] = e.target.value.trim();
+      update3col();
+    });
+  });
+}
+
+// YOUR TEMPLATE KEPT VERBATIM (placeholders only)
+const TEMPLATE_3COL = String.raw`<head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
   /* Mobile-only overrides (Gmail/Android friendly) */
@@ -189,53 +286,159 @@
   </table>
 </body>`;
 
-  function buildHTML() {
-    let html = TEMPLATE;
+function buildHtml3col() {
+  let html = TEMPLATE_3COL;
 
-    products.forEach((p, idx) => {
-      const n = idx + 1;
-      html = html
-        .replaceAll(`{{href${n}}}`, p.href || "#")
-        .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x604.png?text=Image")
-        .replaceAll(`{{alt${n}}}`, escapeHtml(p.alt || ""));
-    });
+  products3col.forEach((p, idx) => {
+    const n = idx + 1;
 
-    return html.trim();
+    const finalHref = utmToggle3.checked
+      ? addUTM(p.href, {
+          utm_source: utmSource3.value.trim(),
+          utm_medium: utmMedium3.value.trim(),
+          utm_campaign: utmCampaign3.value.trim()
+        })
+      : (p.href || "#");
+
+    html = html
+      .replaceAll(`{{href${n}}}`, finalHref || "#")
+      .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x604.png?text=Image")
+      .replaceAll(`{{alt${n}}}`, escapeHtml(p.alt || ""));
+  });
+
+  return html.trim();
+}
+
+function update3col() {
+  utmFields3.style.display = utmToggle3.checked ? "grid" : "none";
+  const html = buildHtml3col();
+  output3colEl.value = html;
+  preview3colEl.innerHTML = html;
+}
+
+copyBtn3col.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(output3colEl.value);
+    copyStatus3col.textContent = "Afritað! Límdu í SendGrid Code Block.";
+    setTimeout(() => copyStatus3col.textContent = "", 1500);
+  } catch {
+    copyStatus3col.textContent = "Gat ekki afritað — afritaðu handvirkt.";
   }
+});
 
-  function update() {
-    const html = buildHTML();
-    outputEl.value = html;
-    previewEl.innerHTML = html; // internal use only; SendGrid will use the copied code
-  }
+resetBtn3col.addEventListener("click", () => {
+  products3col.forEach(p => { p.href=""; p.src=""; p.alt=""; });
+  renderInputs3col();
+  update3col();
+});
 
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
+[utmToggle3, utmSource3, utmMedium3, utmCampaign3].forEach(el =>
+  el.addEventListener("input", update3col)
+);
 
-  copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(outputEl.value);
-      copyStatus.textContent = "Afritað! Límdu í SendGrid Code Block.";
-      setTimeout(() => copyStatus.textContent = "", 2000);
-    } catch {
-      copyStatus.textContent = "Tókst ekki að afrita sjálfvirkt — veldu textann og afritaðu handvirkt.";
+/* ===================== TAB 2: Card builder ===================== */
+/* EDIT THIS if your Worker URL changes */
+const PROXY_URL =
+  "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/?url=";
+
+const productUrlCardEl = document.getElementById("productUrlCard");
+const createBtnCard = document.getElementById("createBtnCard");
+const copyBtnCard = document.getElementById("copyBtnCard");
+const previewCardEl = document.getElementById("previewCard");
+const outputCardEl = document.getElementById("outputCard");
+const statusCardEl = document.getElementById("statusCard");
+
+createBtnCard.addEventListener("click", async () => {
+  const url = productUrlCardEl.value.trim();
+  if (!url) return setStatusCard("Settu inn slóð.", true);
+
+  setStatusCard("Sæki vöru…", false);
+  previewCardEl.innerHTML = "";
+  outputCardEl.value = "";
+
+  try {
+    const data = await fetch(PROXY_URL + encodeURIComponent(url)).then(r => r.json());
+
+    if (!data?.name || !data?.price || !data?.image) {
+      throw new Error("Missing fields in JSON");
     }
-  });
 
-  resetBtn.addEventListener("click", () => {
-    products.forEach(p => { p.href=""; p.src=""; p.alt=""; });
-    renderInputs();
-    update();
-  });
+    const cardHtml = buildCardHtml(data);
+    outputCardEl.value = cardHtml;
+    previewCardEl.innerHTML = `<div class="card-shell">${cardHtml}</div>`;
 
-  renderInputs();
-  update();
+    setStatusCard("Tilbúið ✅", false);
+  } catch (e) {
+    console.error(e);
+    setStatusCard("Tókst ekki að sækja vöru. Athugaðu slóð eða proxy.", true);
+  }
+});
+
+copyBtnCard.addEventListener("click", async () => {
+  if (!outputCardEl.value) return;
+  try {
+    await navigator.clipboard.writeText(outputCardEl.value);
+    setStatusCard("Afritað HTML ✅", false);
+    setTimeout(()=>setStatusCard("",false), 1200);
+  } catch {
+    setStatusCard("Gat ekki afritað — afritaðu handvirkt.", true);
+  }
+});
+
+function buildCardHtml(p) {
+  // Update styling later to match Figma perfectly if you want
+  return `
+<!-- Product card -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; max-width:320px; margin:0 auto;">
+  <tr>
+    <td style="border:1px solid #eeeeee; border-radius:14px; overflow:hidden;">
+      <a href="${p.url}" target="_blank" style="text-decoration:none;">
+        <img src="${p.image}" alt="${escapeHtml(p.name)}" style="display:block;width:100%;height:auto;border:0;" />
+      </a>
+      <div style="padding:12px; font-family:Arial,sans-serif;">
+        <div style="font-size:16px;font-weight:700;line-height:1.25;color:#111111;">${escapeHtml(p.name)}</div>
+        <div style="margin-top:6px;font-size:15px;font-weight:600;color:#111111;">${escapeHtml(p.price)}</div>
+        <a href="${p.url}" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 10px;border-radius:8px;background:#111111;color:#ffffff;text-decoration:none;font-weight:700;font-size:13px;">Skoða vöru</a>
+      </div>
+    </td>
+  </tr>
+</table>
+<!-- /Product card -->
+`.trim();
+}
+
+function setStatusCard(msg, isError){
+  statusCardEl.textContent = msg;
+  statusCardEl.style.color = isError ? "#b00020" : "#333";
+}
+
+/* ===================== Helpers ===================== */
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function addUTM(url, utmObj) {
+  if (!url) return "#";
+  try {
+    const u = new URL(url);
+    Object.entries(utmObj).forEach(([k, v]) => {
+      if (!v) return;
+      if (!u.searchParams.has(k)) u.searchParams.set(k, v);
+    });
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/* Init */
+renderInputs3col();
+update3col();
 </script>
 </body>
 </html>
