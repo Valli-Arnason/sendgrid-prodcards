@@ -386,20 +386,88 @@ copyBtnCard.addEventListener("click", async () => {
 });
 
 function buildCardHtml(p) {
-  // Update styling later to match Figma perfectly if you want
+  // ====== STYLE CONSTANTS (from your Figma + mobile requirement) ======
+  const CARD_WIDTH = 420;            // px (your mobile requirement)
+  const CARD_HEIGHT = 171;           // px (Figma height; treated as min-height)
+  const RADIUS = 8;                 // px
+  const BORDER = "1px solid #D9D9D9";
+  const BG = "#FFFFFF";
+
+  const PAD = 12;                    // inner padding px (keep unless Figma says otherwise)
+
+  const NAME_SIZE = 16;              // px (tweak if Figma text differs)
+  const NAME_WEIGHT = 700;
+  const NAME_COLOR = "#111111";
+  const NAME_LINE = 1.25;
+
+  const PRICE_SIZE = 15;             // px
+  const PRICE_WEIGHT = 600;
+  const PRICE_COLOR = "#111111";
+  const PRICE_TOP = 6;              // px spacing above price
+
+  const BTN_BG = "#111111";
+  const BTN_COLOR = "#FFFFFF";
+  const BTN_RADIUS = 8;              // keep aligned with card radius vibe
+  const BTN_PAD_Y = 8;
+  const BTN_PAD_X = 10;
+  const BTN_SIZE = 13;
+  const BTN_WEIGHT = 700;
+  const BTN_TOP = 10;
+  const BTN_TEXT = "Skoða vöru";
+  // ================================================================
+
   return `
 <!-- Product card -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; max-width:320px; margin:0 auto;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="border-collapse:collapse; max-width:${CARD_WIDTH}px; margin:0 auto;">
   <tr>
-    <td style="border:1px solid #eeeeee; border-radius:14px; overflow:hidden;">
+    <td style="
+      border:${BORDER};
+      border-radius:${RADIUS}px;
+      overflow:hidden;
+      background:${BG};
+      min-height:${CARD_HEIGHT}px;
+    ">
       <a href="${p.url}" target="_blank" style="text-decoration:none;">
-        <img src="${p.image}" alt="${escapeHtml(p.name)}" style="display:block;width:100%;height:auto;border:0;" />
+        <img src="${p.image}" alt="${escapeHtml(p.name)}"
+             style="display:block; width:100%; height:auto; border:0;" />
       </a>
-      <div style="padding:12px; font-family:Arial,sans-serif;">
-        <div style="font-size:16px;font-weight:700;line-height:1.25;color:#111111;">${escapeHtml(p.name)}</div>
-        <div style="margin-top:6px;font-size:15px;font-weight:600;color:#111111;">${escapeHtml(p.price)}</div>
-        <a href="${p.url}" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 10px;border-radius:8px;background:#111111;color:#ffffff;text-decoration:none;font-weight:700;font-size:13px;">Skoða vöru</a>
-      </div>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="border-collapse:collapse;">
+        <tr>
+          <td style="padding:${PAD}px; font-family:Arial,sans-serif;">
+            <div style="
+              font-size:${NAME_SIZE}px;
+              font-weight:${NAME_WEIGHT};
+              line-height:${NAME_LINE};
+              color:${NAME_COLOR};
+              margin:0;
+            ">${escapeHtml(p.name)}</div>
+
+            <div style="
+              margin-top:${PRICE_TOP}px;
+              font-size:${PRICE_SIZE}px;
+              font-weight:${PRICE_WEIGHT};
+              line-height:1.2;
+              color:${PRICE_COLOR};
+            ">${escapeHtml(p.price)}</div>
+
+            <a href="${p.url}" target="_blank" style="
+              display:inline-block;
+              margin-top:${BTN_TOP}px;
+              padding:${BTN_PAD_Y}px ${BTN_PAD_X}px;
+              border-radius:${BTN_RADIUS}px;
+              background:${BTN_BG};
+              color:${BTN_COLOR};
+              text-decoration:none;
+              font-weight:${BTN_WEIGHT};
+              font-size:${BTN_SIZE}px;
+              line-height:1;
+            ">${BTN_TEXT}</a>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>
@@ -442,3 +510,4 @@ update3col();
 </script>
 </body>
 </html>
+
