@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="is">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SendGrid tools</title>
@@ -119,12 +120,12 @@
 
         <div class="row3" id="inputs3col" style="margin-top:12px;"></div>
 
-        <div class="btns">
-          <button class="ghost" id="resetBtn3col" type="button">Hreinsa</button>
-          <button id="copyBtn3col" type="button">Afrita HTML</button>
-        </div>
-        <div id="copyStatus3col" class="note"></div>
-      </div>
+<div class="btns">
+  <button id="createBtnCard" type="button">Create card</button>
+  <button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
+  <button id="downloadPngBtnCard" class="ghost" type="button">Download PNG</button>
+</div>
+
 
       <div class="panel">
         <h2>Forskoðun</h2>
@@ -165,6 +166,47 @@
 
 <script>
 /* ===================== Tabs ===================== */
+const downloadPngBtnCard = document.getElementById("downloadPngBtnCard");
+
+downloadPngBtnCard.addEventListener("click", async () => {
+  // The preview wrapper we use for capture
+  const node = previewCardEl.querySelector(".card-shell");
+  if (!node) {
+    setStatusCard("Engin kort til að sækja. Búðu fyrst til kort.", true);
+    return;
+  }
+
+  setStatusCard("Bý til PNG…", false);
+
+  try {
+    // Wait for Basic Sans + other fonts to be ready
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    const canvas = await html2canvas(node, {
+      backgroundColor: "#ffffff", // white card background
+      scale: 1,                   // 1:1 => 512×604 exactly
+      useCORS: true
+    });
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `product-card-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setStatusCard("PNG sótt ✅", false);
+    setTimeout(() => setStatusCard("", false), 1200);
+  } catch (e) {
+    console.error(e);
+    setStatusCard("Tókst ekki að búa til PNG.", true);
+  }
+});
+
+
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -530,6 +572,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
