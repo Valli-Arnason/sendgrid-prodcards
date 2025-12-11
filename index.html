@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SendGrid tools</title>
 <style>
-  /* Load Basic Sans for product card rendering */
+  /* Load Basic Sans from /fonts */
   @font-face {
     font-family: "Basic Sans";
     src: url("./fonts/basicsans-regular.woff") format("woff");
@@ -14,7 +14,7 @@
     font-display: swap;
   }
 
-  /* UI (tabs, inputs, labels, etc.) should NOT use Basic Sans */
+  /* UI uses system font */
   body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     margin: 24px;
@@ -65,21 +65,18 @@
   .utm-grid input { font-size:13px; }
   .small { font-size:12px; color:#555; margin-top:6px; }
 
-  /* ---------------------------------------------------------- */
-  /* FIXED-SIZE PRODUCT CARD PREVIEW (ALWAYS 512 × 604 PX)      */
-  /* ---------------------------------------------------------- */
+  /* Fixed-size product card preview: exactly 512×604 */
   .card-shell {
-    width: 512px;               /* fixed width */
-    height: 604px;              /* fixed height */
-    border: 1px solid #D9D9D9;
-    border-radius: 8px;
-    background: #FFFFFF;
-    overflow: hidden;
-    box-sizing: border-box;
-    margin-top: 14px;
-
-    /* Basic Sans applied only to card content */
-    font-family: "Basic Sans", Arial, sans-serif;
+    margin-top:14px;
+    width:512px;
+    height:604px;
+    border:1px solid #D9D9D9;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 1px 6px rgba(0,0,0,0.06);
+    background:#fff;
+    box-sizing:border-box;
+    font-family:"Basic Sans", Arial, sans-serif;
   }
 </style>
 
@@ -540,6 +537,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
