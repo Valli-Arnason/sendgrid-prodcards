@@ -413,94 +413,87 @@ copyBtnCard.addEventListener("click", async () => {
 });
 
 function buildCardHtml(p) {
-  // ====== STYLE CONSTANTS (from your Figma + mobile requirement) ======
-  const CARD_WIDTH = 420;            // px (your mobile requirement)
-  const CARD_HEIGHT = 171;           // px (Figma height; treated as min-height)
-  const RADIUS = 8;                 // px
-  const BORDER = "1px solid #D9D9D9";
-  const BG = "#FFFFFF";
+  // Fixed card shell: .card-shell is 512x604, we just fill it.
+  const PADDING = 24;          // overall inner padding
+  const IMAGE_AREA_HEIGHT = 320; // top area reserved for image (inside padding)
 
-  const PAD = 12;                    // inner padding px (keep unless Figma says otherwise)
+  const hasDiscount = !!(p.priceOld && p.priceNew);
+  const newPriceText = hasDiscount ? p.priceNew : p.price;
 
-  const NAME_SIZE = 16;              // px (tweak if Figma text differs)
-  const NAME_WEIGHT = 700;
-  const NAME_COLOR = "#111111";
-  const NAME_LINE = 1.25;
-
-  const PRICE_SIZE = 15;             // px
-  const PRICE_WEIGHT = 600;
-  const PRICE_COLOR = "#111111";
-  const PRICE_TOP = 6;              // px spacing above price
-
-  const BTN_BG = "#111111";
-  const BTN_COLOR = "#FFFFFF";
-  const BTN_RADIUS = 8;              // keep aligned with card radius vibe
-  const BTN_PAD_Y = 8;
-  const BTN_PAD_X = 10;
-  const BTN_SIZE = 13;
-  const BTN_WEIGHT = 700;
-  const BTN_TOP = 10;
-  const BTN_TEXT = "Skoða vöru";
-  // ================================================================
+  const oldPriceHtml = hasDiscount
+    ? `<span style="
+          font-family:'Basic Sans', Arial, sans-serif;
+          font-size:16px;
+          font-weight:600;
+          color:#787878;
+          text-decoration:line-through;
+          margin-right:10px;
+        ">${escapeHtml(p.priceOld)}</span>`
+    : "";
 
   return `
-<!-- Product card -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="border-collapse:collapse; max-width:${CARD_WIDTH}px; margin:0 auto;">
-  <tr>
-    <td style="
-      border:${BORDER};
-      border-radius:${RADIUS}px;
-      overflow:hidden;
-      background:${BG};
-      min-height:${CARD_HEIGHT}px;
+<!-- Product card content (inside fixed 512x604 .card-shell) -->
+<div style="
+  width:100%;
+  height:100%;
+  box-sizing:border-box;
+  padding:${PADDING}px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:stretch;
+">
+
+  <!-- Image block with padding and containment -->
+  <div style="
+    flex:1 1 auto;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  ">
+    <img src="${p.image}" alt="${escapeHtml(p.name)}"
+         style="
+           max-width:100%;
+           max-height:${IMAGE_AREA_HEIGHT}px;
+           object-fit:contain;
+           display:block;
+           border:0;
+         " />
+  </div>
+
+  <!-- Text block -->
+  <div style="flex:0 0 auto;">
+    <div style="
+      font-family:'Basic Sans', Arial, sans-serif;
+      font-size:20px;
+      font-weight:700;
+      line-height:1.25;
+      color:#111111;
+      margin:0 0 8px 0;
     ">
-      <a href="${p.url}" target="_blank" style="text-decoration:none;">
-        <img src="${p.image}" alt="${escapeHtml(p.name)}"
-             style="display:block; width:100%; height:auto; border:0;" />
-      </a>
+      ${escapeHtml(p.name)}
+    </div>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-             style="border-collapse:collapse;">
-        <tr>
-          <td style="padding:${PAD}px; font-family:Arial,sans-serif;">
-            <div style="
-              font-size:${NAME_SIZE}px;
-              font-weight:${NAME_WEIGHT};
-              line-height:${NAME_LINE};
-              color:${NAME_COLOR};
-              margin:0;
-            ">${escapeHtml(p.name)}</div>
+    <div style="line-height:1.2;">
+      ${oldPriceHtml}
+      <span style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:18px;
+        font-weight:700;
+        color:#111111;
+      ">
+        ${escapeHtml(newPriceText)}
+      </span>
+    </div>
+  </div>
 
-            <div style="
-              margin-top:${PRICE_TOP}px;
-              font-size:${PRICE_SIZE}px;
-              font-weight:${PRICE_WEIGHT};
-              line-height:1.2;
-              color:${PRICE_COLOR};
-            ">${escapeHtml(p.price)}</div>
-
-            <a href="${p.url}" target="_blank" style="
-              display:inline-block;
-              margin-top:${BTN_TOP}px;
-              padding:${BTN_PAD_Y}px ${BTN_PAD_X}px;
-              border-radius:${BTN_RADIUS}px;
-              background:${BTN_BG};
-              color:${BTN_COLOR};
-              text-decoration:none;
-              font-weight:${BTN_WEIGHT};
-              font-size:${BTN_SIZE}px;
-              line-height:1;
-            ">${BTN_TEXT}</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-<!-- /Product card -->
+</div>
+<!-- /Product card content -->
 `.trim();
 }
+
 
 function setStatusCard(msg, isError){
   statusCardEl.textContent = msg;
@@ -537,6 +530,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
