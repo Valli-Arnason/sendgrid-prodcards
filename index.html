@@ -1,87 +1,90 @@
 <!doctype html>
 <html lang="is">
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SendGrid tools</title>
-<style>
-  /* Load Basic Sans from /fonts */
-  @font-face {
-    font-family: "Basic Sans";
-    src: url("./fonts/basicsans-regular.woff") format("woff");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
 
-  /* UI uses system font */
-  body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    margin: 24px;
-    color: #111;
-  }
+  <!-- html2canvas for PNG export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  h1 { font-size: 20px; margin: 0 0 6px; }
-  .muted { color:#666; font-size: 12px; margin: 0 0 14px; }
+  <style>
+    /* Load Basic Sans from /fonts */
+    @font-face {
+      font-family: "Basic Sans";
+      src: url("./fonts/basicsans-regular.woff") format("woff");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
 
-  /* Tabs */
-  .tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-  .tab-btn {
-    cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid #111;
-    background:#fff; color:#111; font-weight:700; font-size:13px;
-  }
-  .tab-btn.active { background:#111; color:#fff; }
-  .tab { display:none; }
-  .tab.active { display:block; }
+    /* UI uses system font */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 24px;
+      color: #111;
+    }
 
-  /* Shared layout */
-  .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-  .panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
-  .panel h2 { font-size: 16px; margin: 0 0 10px; }
-  label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
-  input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
-  textarea {
-    width:100%; min-height: 280px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
-    white-space: pre; overflow:auto;
-  }
-  .preview { background:#fafafa; padding: 10px; border-radius: 8px; border:1px dashed #ccc; overflow:auto; }
-  .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
-  button {
-    cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111;
-    background:#111; color:#fff; font-weight:700;
-  }
-  button.ghost { background:#fff; color:#111; }
-  .note { font-size:12px; color:#444; margin-top:8px; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .muted { color:#666; font-size: 12px; margin: 0 0 14px; }
 
-  /* 3-column input */
-  .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    /* Tabs */
+    .tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .tab-btn {
+      cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid #111;
+      background:#fff; color:#111; font-weight:700; font-size:13px;
+    }
+    .tab-btn.active { background:#111; color:#fff; }
+    .tab { display:none; }
+    .tab.active { display:block; }
 
-  /* UTM controls */
-  .toggle-row { display:flex; align-items:center; gap:8px; margin-top: 6px; }
-  .toggle-row input[type="checkbox"] { width:auto; transform: translateY(1px); }
-  .utm-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top: 8px; }
-  .utm-grid input { font-size:13px; }
-  .small { font-size:12px; color:#555; margin-top:6px; }
+    /* Shared layout */
+    .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+    .panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
+    .panel h2 { font-size: 16px; margin: 0 0 10px; }
+    label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
+    input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
+    textarea {
+      width:100%; min-height: 280px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
+      white-space: pre; overflow:auto;
+    }
+    .preview { background:#fafafa; padding: 10px; border-radius: 8px; border:1px dashed #ccc; overflow:auto; }
+    .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    button {
+      cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111;
+      background:#111; color:#fff; font-weight:700;
+    }
+    button.ghost { background:#fff; color:#111; }
+    .note { font-size:12px; color:#444; margin-top:8px; }
 
-  /* Fixed-size product card preview: exactly 512×604 */
-  .card-shell {
-    margin-top:14px;
-    width:512px;
-    height:604px;
-    border:1px solid #D9D9D9;
-    border-radius:8px;
-    overflow:hidden;
-    box-shadow:0 1px 6px rgba(0,0,0,0.06);
-    background:#fff;
-    box-sizing:border-box;
-    font-family:"Basic Sans", Arial, sans-serif;
-  }
-</style>
+    /* 3-column input */
+    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
 
+    /* UTM controls */
+    .toggle-row { display:flex; align-items:center; gap:8px; margin-top: 6px; }
+    .toggle-row input[type="checkbox"] { width:auto; transform: translateY(1px); }
+    .utm-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top: 8px; }
+    .utm-grid input { font-size:13px; }
+    .small { font-size:12px; color:#555; margin-top:6px; }
+
+    /* Fixed-size product card preview: exactly 512×604 */
+    .card-shell {
+      margin-top:14px;
+      width:512px;
+      height:604px;
+      border:1px solid #D9D9D9;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 1px 6px rgba(0,0,0,0.06);
+      background:#fff;
+      box-sizing:border-box;
+      font-family:"Basic Sans", Arial, sans-serif;
+    }
+  </style>
 </head>
+
 <body>
   <h1>SendGrid marketing tools</h1>
   <p class="muted">Two-tools: 3 column block for code view + “Create card” from product url.</p>
@@ -120,12 +123,12 @@
 
         <div class="row3" id="inputs3col" style="margin-top:12px;"></div>
 
-<div class="btns">
-  <button id="createBtnCard" type="button">Create card</button>
-  <button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
-  <button id="downloadPngBtnCard" class="ghost" type="button">Download PNG</button>
-</div>
-
+        <div class="btns">
+          <button id="resetBtn3col" class="ghost" type="button">Hreinsa</button>
+          <button id="copyBtn3col" type="button">Afrita HTML</button>
+        </div>
+        <div id="copyStatus3col" class="note"></div>
+      </div>
 
       <div class="panel">
         <h2>Forskoðun</h2>
@@ -143,12 +146,13 @@
       <div class="panel">
         <h2>Create card from url</h2>
 
-        <label>Product URL (site.com/product/...)</label>
-        <input id="productUrlCard" placeholder="https://site.com/product/1234567" />
+        <label>Product URL (kronan.is/vara/...)</label>
+        <input id="productUrlCard" placeholder="https://kronan.is/vara/100258554" />
 
         <div class="btns">
           <button id="createBtnCard" type="button">Create card</button>
           <button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
+          <button id="downloadPngBtnCard" class="ghost" type="button">Download PNG</button>
         </div>
 
         <div id="statusCard" class="note"></div>
@@ -166,47 +170,6 @@
 
 <script>
 /* ===================== Tabs ===================== */
-const downloadPngBtnCard = document.getElementById("downloadPngBtnCard");
-
-downloadPngBtnCard.addEventListener("click", async () => {
-  // The preview wrapper we use for capture
-  const node = previewCardEl.querySelector(".card-shell");
-  if (!node) {
-    setStatusCard("Engin kort til að sækja. Búðu fyrst til kort.", true);
-    return;
-  }
-
-  setStatusCard("Bý til PNG…", false);
-
-  try {
-    // Wait for Basic Sans + other fonts to be ready
-    if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
-    }
-
-    const canvas = await html2canvas(node, {
-      backgroundColor: "#ffffff", // white card background
-      scale: 1,                   // 1:1 => 512×604 exactly
-      useCORS: true
-    });
-
-    const dataUrl = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `product-card-${Date.now()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    setStatusCard("PNG sótt ✅", false);
-    setTimeout(() => setStatusCard("", false), 1200);
-  } catch (e) {
-    console.error(e);
-    setStatusCard("Tókst ekki að búa til PNG.", true);
-  }
-});
-
-
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -247,7 +210,7 @@ function renderInputs3col() {
         <strong>Dálkur ${idx+1}</strong>
 
         <label>Vörutengill (href)</label>
-        <input data-k="href" data-i="${idx}" placeholder="https://site.com/product/..." value="${p.href}"/>
+        <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/vara/..." value="${p.href}"/>
 
         <label>Myndatengill (src)</label>
         <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
@@ -269,7 +232,6 @@ function renderInputs3col() {
   });
 }
 
-// YOUR TEMPLATE KEPT VERBATIM (placeholders only)
 const TEMPLATE_3COL = String.raw`<head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
@@ -413,6 +375,7 @@ const PROXY_URL =
 const productUrlCardEl = document.getElementById("productUrlCard");
 const createBtnCard = document.getElementById("createBtnCard");
 const copyBtnCard = document.getElementById("copyBtnCard");
+const downloadPngBtnCard = document.getElementById("downloadPngBtnCard");
 const previewCardEl = document.getElementById("previewCard");
 const outputCardEl = document.getElementById("outputCard");
 const statusCardEl = document.getElementById("statusCard");
@@ -454,10 +417,46 @@ copyBtnCard.addEventListener("click", async () => {
   }
 });
 
+downloadPngBtnCard.addEventListener("click", async () => {
+  const node = previewCardEl.querySelector(".card-shell");
+  if (!node) {
+    setStatusCard("Engin kort til að sækja. Búðu fyrst til kort.", true);
+    return;
+  }
+
+  setStatusCard("Bý til PNG…", false);
+
+  try {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    const canvas = await html2canvas(node, {
+      backgroundColor: "#ffffff",
+      scale: 1,
+      useCORS: true
+    });
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `product-card-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setStatusCard("PNG sótt ✅", false);
+    setTimeout(() => setStatusCard("", false), 1200);
+  } catch (e) {
+    console.error(e);
+    setStatusCard("Tókst ekki að búa til PNG.", true);
+  }
+});
+
 function buildCardHtml(p) {
   // Fixed card shell: .card-shell is 512x604, we just fill it.
-  const PADDING = 24;          // overall inner padding
-  const IMAGE_AREA_HEIGHT = 320; // top area reserved for image (inside padding)
+  const PADDING = 24;             // overall inner padding
+  const IMAGE_AREA_HEIGHT = 320;  // top area reserved for image
 
   const hasDiscount = !!(p.priceOld && p.priceNew);
   const newPriceText = hasDiscount ? p.priceNew : p.price;
@@ -536,7 +535,6 @@ function buildCardHtml(p) {
 `.trim();
 }
 
-
 function setStatusCard(msg, isError){
   statusCardEl.textContent = msg;
   statusCardEl.style.color = isError ? "#b00020" : "#333";
@@ -572,9 +570,3 @@ update3col();
 </script>
 </body>
 </html>
-
-
-
-
-
-
