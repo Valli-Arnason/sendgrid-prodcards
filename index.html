@@ -92,6 +92,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="tab-3col">3-column block</button>
     <button class="tab-btn" data-tab="tab-card">Create card from url</button>
+    <button class="tab-btn" data-tab="tab-2recipes">2-column recipes</button>
   </div>
 
   <!-- ===================== TAB 1: 3-column generator ===================== -->
@@ -140,6 +141,32 @@
     </div>
   </section>
 
+<!-- ===================== TAB: 2-column recipes ===================== -->
+<section id="tab-2recipes" class="tab">
+  <div class="wrap">
+    <div class="panel">
+      <h2>2-column recipes</h2>
+
+      <div class="row3" id="inputs2recipes" style="margin-top:12px; grid-template-columns: repeat(2,1fr);"></div>
+
+      <div class="btns">
+        <button id="resetBtn2recipes" class="ghost" type="button">Hreinsa</button>
+        <button id="copyBtn2recipes" type="button">Afrita HTML</button>
+      </div>
+      <div id="copyStatus2recipes" class="note"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div class="preview" id="preview2recipes"></div>
+
+      <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+      <textarea id="output2recipes" readonly></textarea>
+    </div>
+  </div>
+</section>
+
+  
   <!-- ===================== TAB 2: Product card builder ===================== -->
   <section id="tab-card" class="tab">
     <div class="wrap">
@@ -374,6 +401,163 @@ resetBtn3col.addEventListener("click", () => {
 [utmToggle3, utmSource3, utmMedium3, utmCampaign3].forEach(el =>
   el.addEventListener("input", update3col)
 );
+
+
+  /* ===================== TAB: 2-column recipes ===================== */
+const NUM_RECIPES = 2;
+
+const recipes2 = Array.from({ length: NUM_RECIPES }, () => ({
+  href: "",
+  src: ""
+}));
+
+const inputs2recipesEl = document.getElementById("inputs2recipes");
+const output2recipesEl = document.getElementById("output2recipes");
+const preview2recipesEl = document.getElementById("preview2recipes");
+const copyBtn2recipes = document.getElementById("copyBtn2recipes");
+const resetBtn2recipes = document.getElementById("resetBtn2recipes");
+const copyStatus2recipes = document.getElementById("copyStatus2recipes");
+
+function renderInputs2recipes() {
+  inputs2recipesEl.innerHTML = "";
+
+  recipes2.forEach((p, idx) => {
+    const card = document.createElement("div");
+    card.innerHTML = `
+      <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
+        <strong>Dálkur ${idx + 1}</strong>
+
+        <label>Vörutengill (href)</label>
+        <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/uppskriftir/..." value="${p.href}"/>
+
+        <label>Myndatengill (src)</label>
+        <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
+      </div>
+    `;
+    inputs2recipesEl.appendChild(card);
+  });
+
+  inputs2recipesEl.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const i = Number(e.target.dataset.i);
+      const k = e.target.dataset.k;
+      recipes2[i][k] = e.target.value.trim();
+      update2recipes();
+    });
+  });
+}
+
+// YOUR TEMPLATE KEPT VERBATIM (only href/src placeholders)
+const TEMPLATE_2RECIPES = String.raw`<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Mobile-only overrides (Gmail/Android friendly) */
+  @media only screen and (max-width:640px),
+         only screen and (max-device-width:640px) {
+
+    .responsive-table, [class~="responsive-table"] {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important; /* avoid double padding from wrapper */
+    }
+
+    .column, [class~="column"] {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      margin: 0 auto 10px !important;
+      padding: 0 !important; /* prevent compounding widths */
+    }
+
+    /* Reliable 28px side gutters per card */
+    .mobile-pad, [class~="mobile-pad"] {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+
+    .column img, [class~="column"] img {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+      display: block !important;
+      margin: 0 auto !important;
+    }
+  }
+  </style>
+</head>
+
+<body>
+  <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+    <tr>
+      <!-- First Column -->
+      <td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <!-- Mobile adds 28px L/R here -->
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href1}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maiskokur" src="{{src1}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      
+
+      <!-- Second Column -->
+      </td><td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href2}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maískokur" src="{{src2}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    
+  </tr></table>
+</body>`;
+
+function buildHtml2recipes() {
+  let html = TEMPLATE_2RECIPES;
+
+  recipes2.forEach((p, idx) => {
+    const n = idx + 1;
+    html = html
+      .replaceAll(`{{href${n}}}`, p.href || "#")
+      .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x517.png?text=Recipe");
+  });
+
+  return html.trim();
+}
+
+function update2recipes() {
+  const html = buildHtml2recipes();
+  output2recipesEl.value = html;
+  preview2recipesEl.innerHTML = html;
+}
+
+copyBtn2recipes.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(output2recipesEl.value);
+    copyStatus2recipes.textContent = "Afritað! Límdu í SendGrid Code Block.";
+    setTimeout(() => copyStatus2recipes.textContent = "", 1500);
+  } catch {
+    copyStatus2recipes.textContent = "Gat ekki afritað — afritaðu handvirkt.";
+  }
+});
+
+resetBtn2recipes.addEventListener("click", () => {
+  recipes2.forEach(p => { p.href = ""; p.src = ""; });
+  renderInputs2recipes();
+  update2recipes();
+});
+
+/* Init */
+renderInputs2recipes();
+update2recipes();
 
 /* ===================== TAB 2: Card builder ===================== */
 /* EDIT THIS if your Worker URL changes */
@@ -708,6 +892,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
