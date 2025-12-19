@@ -7,6 +7,7 @@
 
   <!-- html2canvas for PNG export -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
 
   <style>
     /* Load Basic Sans from /fonts */
@@ -757,14 +758,36 @@ downloadPngBtnCard.addEventListener("click", async () => {
 
     ctx.drawImage(canvas, 0, 0);
 
-    const dataUrl = out.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `product-card-${Date.now()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+// --- Compress PNG via palette quantization ---
+const ctx2 = out.getContext("2d");
+const imgData = ctx2.getImageData(0, 0, out.width, out.height);
 
+// 256 colors = gott jafnvægi milli size og skýrleika
+const MAX_COLORS = 256;
+const DITHER = 0;
+
+const rgba = imgData.data.buffer;
+const compressed = UPNG.encode(
+  [rgba],
+  out.width,
+  out.height,
+  MAX_COLORS,
+  DITHER
+);
+
+// Download
+const blob = new Blob([compressed], { type: "image/png" });
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+a.href = url;
+a.download = `product-card-${Date.now()}.png`;
+document.body.appendChild(a);
+a.click();
+
+URL.revokeObjectURL(url);
+a.remove();
+    
     setStatusCard("PNG sótt ✅", false);
     setTimeout(() => setStatusCard("", false), 1200);
   } catch (e) {
@@ -1270,6 +1293,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
