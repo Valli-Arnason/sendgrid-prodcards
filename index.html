@@ -93,6 +93,7 @@
     <button class="tab-btn active" data-tab="tab-3col">3-column block</button>
     <button class="tab-btn" data-tab="tab-card">Create card from url</button>
     <button class="tab-btn" data-tab="tab-2recipes">2-column recipes</button>
+    <button class="tab-btn" data-tab="tab-recipe-card">Create recipe card</button>
   </div>
 
   <!-- ===================== TAB 1: 3-column generator ===================== -->
@@ -202,6 +203,54 @@
       </div>
     </div>
   </section>
+
+  <section id="tab-recipe-card" class="tab">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Create recipe card</h2>
+
+      <label>Recipe URL (kronan.is/uppskriftir/...)</label>
+      <input id="recipeUrlCard" placeholder="https://kronan.is/uppskriftir/kalkunabringa" />
+
+      <!-- Optional overrides -->
+      <label>Title (optional edit)</label>
+      <input id="manualRecipeTitle" placeholder="(auto-filled after Create)" />
+
+      <label>Likes (optional edit)</label>
+      <input id="manualRecipeLikes" placeholder="e.g. 9" />
+
+      <label>Servings (optional edit)</label>
+      <input id="manualRecipeServings" placeholder="e.g. 4" />
+
+      <label>Prep (optional edit)</label>
+      <input id="manualRecipePrep" placeholder="e.g. 40 mín." />
+
+      <label>Cook (optional edit)</label>
+      <input id="manualRecipeCook" placeholder="e.g. 50 mín." />
+
+      <label>Total (optional edit)</label>
+      <input id="manualRecipeTotal" placeholder="e.g. 130 mín." />
+
+      <div class="btns">
+        <button id="createBtnRecipe" type="button">Create recipe card</button>
+        <button id="updateBtnRecipe" class="ghost" type="button">Update card</button>
+        <button id="copyBtnRecipe" class="ghost" type="button">Copy HTML</button>
+        <button id="downloadPngBtnRecipe" class="ghost" type="button">Download PNG</button>
+      </div>
+
+      <div id="statusRecipe" class="note"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div id="previewRecipe"></div>
+
+      <h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
+      <textarea id="outputRecipe" readonly></textarea>
+    </div>
+  </div>
+</section>
+
 
 <script>
 /* ===================== Tabs ===================== */
@@ -565,7 +614,8 @@ const PROXY_URL =
   "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/?url=";
 const IMG_PROXY_URL =
   "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/img?url=";
-
+const RECIPE_PROXY_URL =
+  "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/recipe?url=";
 
 const productUrlCardEl = document.getElementById("productUrlCard");
 const createBtnCard = document.getElementById("createBtnCard");
@@ -886,12 +936,315 @@ function addUTM(url, utmObj) {
   }
 }
 
+/* ===================== TAB 3: Recipe card builder ===================== */
+const recipeUrlCardEl = document.getElementById("recipeUrlCard");
+const createBtnRecipe = document.getElementById("createBtnRecipe");
+const updateBtnRecipe = document.getElementById("updateBtnRecipe");
+const copyBtnRecipe = document.getElementById("copyBtnRecipe");
+const downloadPngBtnRecipe = document.getElementById("downloadPngBtnRecipe");
+const previewRecipeEl = document.getElementById("previewRecipe");
+const outputRecipeEl = document.getElementById("outputRecipe");
+const statusRecipeEl = document.getElementById("statusRecipe");
+
+const manualRecipeTitleEl = document.getElementById("manualRecipeTitle");
+const manualRecipeLikesEl = document.getElementById("manualRecipeLikes");
+const manualRecipeServingsEl = document.getElementById("manualRecipeServings");
+const manualRecipePrepEl = document.getElementById("manualRecipePrep");
+const manualRecipeCookEl = document.getElementById("manualRecipeCook");
+const manualRecipeTotalEl = document.getElementById("manualRecipeTotal");
+
+let lastRecipeData = null;
+
+function setStatusRecipe(msg, isError){
+  statusRecipeEl.textContent = msg;
+  statusRecipeEl.style.color = isError ? "#b00020" : "#333";
+}
+
+function mergedRecipeData() {
+  if (!lastRecipeData) return null;
+  const m = { ...lastRecipeData };
+
+  const v = (el) => (el?.value || "").trim();
+
+  if (v(manualRecipeTitleEl)) m.title = v(manualRecipeTitleEl);
+  if (v(manualRecipeLikesEl)) m.likes = v(manualRecipeLikesEl);
+  if (v(manualRecipeServingsEl)) m.servings = v(manualRecipeServingsEl);
+  if (v(manualRecipePrepEl)) m.prep = v(manualRecipePrepEl);
+  if (v(manualRecipeCookEl)) m.cook = v(manualRecipeCookEl);
+  if (v(manualRecipeTotalEl)) m.total = v(manualRecipeTotalEl);
+
+  return m;
+}
+
+function renderRecipeFromState() {
+  const data = mergedRecipeData();
+  if (!data) return;
+
+  const html = buildRecipeCardHtml(data);
+  outputRecipeEl.value = html;
+  previewRecipeEl.innerHTML = html;
+}
+
+createBtnRecipe.addEventListener("click", async () => {
+  const url = recipeUrlCardEl.value.trim();
+  if (!url) return setStatusRecipe("Settu inn slóð.", true);
+
+  setStatusRecipe("Sæki uppskrift…", false);
+  previewRecipeEl.innerHTML = "";
+  outputRecipeEl.value = "";
+
+  try {
+    const data = await fetch(RECIPE_PROXY_URL + encodeURIComponent(url)).then(r => r.json());
+
+    if (!data?.title || !data?.image) throw new Error("Missing fields (title/image)");
+
+    lastRecipeData = data;
+
+    // Prefill
+    manualRecipeTitleEl.value = data.title || "";
+    manualRecipeLikesEl.value = data.likes || "";
+    manualRecipeServingsEl.value = data.servings || "";
+    manualRecipePrepEl.value = data.prep || "";
+    manualRecipeCookEl.value = data.cook || "";
+    manualRecipeTotalEl.value = data.total || "";
+
+    renderRecipeFromState();
+    setStatusRecipe("Tilbúið ✅", false);
+  } catch (e) {
+    console.error(e);
+    setStatusRecipe("Tókst ekki að sækja uppskrift. Athugaðu slóð eða proxy.", true);
+  }
+});
+
+updateBtnRecipe.addEventListener("click", () => {
+  if (!lastRecipeData) return setStatusRecipe("Búðu fyrst til kort með slóð.", true);
+  renderRecipeFromState();
+  setStatusRecipe("Uppfært ✅", false);
+  setTimeout(()=>setStatusRecipe("",false), 1200);
+});
+
+[manualRecipeTitleEl, manualRecipeLikesEl, manualRecipeServingsEl, manualRecipePrepEl, manualRecipeCookEl, manualRecipeTotalEl]
+  .forEach(el => el.addEventListener("input", () => { if (lastRecipeData) renderRecipeFromState(); }));
+
+copyBtnRecipe.addEventListener("click", async () => {
+  if (!outputRecipeEl.value) return;
+  try {
+    await navigator.clipboard.writeText(outputRecipeEl.value);
+    setStatusRecipe("Afritað HTML ✅", false);
+    setTimeout(()=>setStatusRecipe("",false), 1200);
+  } catch {
+    setStatusRecipe("Gat ekki afritað — afritaðu handvirkt.", true);
+  }
+});
+
+downloadPngBtnRecipe.addEventListener("click", async () => {
+  const node = previewRecipeEl.firstElementChild;
+  if (!node) return setStatusRecipe("Engin kort til að sækja. Búðu fyrst til kort.", true);
+
+  setStatusRecipe("Bý til PNG…", false);
+
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+    const canvas = await html2canvas(node, {
+      backgroundColor: null,
+      scale: 1,
+      useCORS: true
+    });
+
+    // Rounded corner mask (matches card radius)
+    const w = canvas.width, h = canvas.height;
+    const r = 16; // your design looks like 16px; change if needed
+
+    const out = document.createElement("canvas");
+    out.width = w; out.height = h;
+    const ctx = out.getContext("2d");
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(w, 0, w, h, r);
+    ctx.arcTo(w, h, 0, h, r);
+    ctx.arcTo(0, h, 0, 0, r);
+    ctx.arcTo(0, 0, w, 0, r);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(canvas, 0, 0);
+
+    const dataUrl = out.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `recipe-card-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setStatusRecipe("PNG sótt ✅", false);
+    setTimeout(() => setStatusRecipe("", false), 1200);
+  } catch (e) {
+    console.error(e);
+    setStatusRecipe("Tókst ekki að búa til PNG.", true);
+  }
+});
+
+function buildRecipeCardHtml(d) {
+  // Fixed size per your requirement
+  const CARD_W = 512;
+  const CARD_H = 517;
+  const RADIUS = 16;
+  const BORDER = "#D9D9D9";
+
+  // Image via IMG proxy for PNG export reliability
+  const imgSrc = IMG_PROXY_URL + encodeURIComponent(d.image);
+
+  // Safe fallbacks
+  const likes = d.likes || "";
+  const servings = d.servings || "";
+  const prep = d.prep || "";
+  const cook = d.cook || "";
+  const total = d.total || "";
+  const title = d.title || "";
+
+  return `
+<div style="
+  width:${CARD_W}px;
+  height:${CARD_H}px;
+  border:1px solid ${BORDER};
+  border-radius:${RADIUS}px;
+  overflow:hidden;
+  background:#ffffff;
+  box-sizing:border-box;
+  font-family:'Basic Sans', Arial, sans-serif;
+">
+
+  <!-- Top image area -->
+  <div style="
+    position:relative;
+    height:300px;
+    width:100%;
+    overflow:hidden;
+  ">
+    <img src="${imgSrc}" alt="${escapeHtml(title)}" style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      border:0;
+    "/>
+
+    <!-- Likes pill -->
+    <div style="
+      position:absolute;
+      left:16px;
+      top:16px;
+      background:#fff;
+      border-radius:12px;
+      padding:8px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.12);
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-weight:700;
+      color:#111;
+    ">
+      <svg width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
+      </svg>
+      <span>${escapeHtml(likes)}</span>
+    </div>
+  </div>
+
+  <!-- Bottom content -->
+  <div style="
+    height:calc(${CARD_H}px - 300px);
+    padding:22px 24px 18px 24px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  ">
+    <div style="
+      font-size:28px;
+      font-weight:700;
+      line-height:1.15;
+      color:#111;
+      margin:0;
+    ">
+      ${escapeHtml(title)}
+    </div>
+
+    <div style="height:1px;background:#E6E6E6;margin:14px 0 14px 0;"></div>
+
+    <div style="
+      display:flex;
+      gap:18px;
+      justify-content:space-between;
+      align-items:flex-end;
+    ">
+      ${metaBlock("Undirbúningur", prep, "whisk")}
+      ${metaBlock("Eldunartími", cook, "pot")}
+      ${metaBlock("Samtals", total, "chef")}
+    </div>
+  </div>
+</div>
+`.trim();
+}
+
+function metaBlock(label, value, icon) {
+  return `
+  <div style="flex:1;min-width:0;">
+    <div style="
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-size:16px;
+      color:#111;
+      margin-bottom:10px;
+    ">${escapeHtml(label)}</div>
+
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${iconSvg(icon)}
+      <div style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:18px;
+        font-weight:500;
+        color:#111;
+      ">${escapeHtml(value)}</div>
+    </div>
+  </div>
+  `;
+}
+
+function iconSvg(kind) {
+  // Simple inline icons (PNG export friendly). Adjust if you have exact SVG assets.
+  if (kind === "whisk") {
+    return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 19c3-2 7-1 10-4 3-3 2-7 4-10" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M6 18l-2 2" stroke="#00D6D6" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  }
+  if (kind === "pot") {
+    return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect x="5" y="9" width="14" height="10" rx="2" fill="#FFD24A" stroke="#111" stroke-width="2"/>
+      <path d="M8 9V7h8v2" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="12" cy="6" r="2" fill="#00D6D6" stroke="#111" stroke-width="2"/>
+    </svg>`;
+  }
+  // chef
+  return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 20v-5h8v5" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M7 10c-1.7 0-3-1.3-3-3s1.3-3 3-3c.6-1.2 1.9-2 3.5-2 1 0 2 .3 2.7 1 1.6-.7 3.8.1 3.8 2 1.7 0 3 1.3 3 3s-1.3 3-3 3H7z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M6 21h12" stroke="#00D6D6" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
+}
+
+
 /* Init */
 renderInputs3col();
 update3col();
 </script>
 </body>
 </html>
+
 
 
 
