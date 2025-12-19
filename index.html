@@ -728,7 +728,7 @@ downloadPngBtnCard.addEventListener("click", async () => {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
     const canvas = await html2canvas(node, {
-      backgroundColor: null,
+      backgroundColor: "#ffffff",
       scale: 1,
       useCORS: true
     });
@@ -1138,6 +1138,7 @@ function buildRecipeCardHtml(d) {
       left:16px;
       top:16px;
       background:#fffff;
+      opacity:1;
       border-radius:12px;
       padding:8px 12px;
       display:flex;
@@ -1270,6 +1271,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
