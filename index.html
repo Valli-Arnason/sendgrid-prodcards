@@ -1,275 +1,275 @@
 <!doctype html>
 <html lang="is">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SendGrid tools</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SendGrid tools</title>
 
-<!-- html2canvas for PNG export -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- html2canvas for PNG export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<style>
-/* Load Basic Sans from /fonts */
-@font-face {
-font-family: "Basic Sans";
-src: url("./fonts/basicsans-regular.woff") format("woff");
-font-weight: 400;
-font-style: normal;
-font-display: swap;
-}
+  <style>
+    /* Load Basic Sans from /fonts */
+    @font-face {
+      font-family: "Basic Sans";
+      src: url("./fonts/basicsans-regular.woff") format("woff");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
 
-/* UI uses system font */
-body {
-font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-margin: 24px;
-color: #111;
-}
+    /* UI uses system font */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 24px;
+      color: #111;
+    }
 
-h1 { font-size: 20px; margin: 0 0 6px; }
-.muted { color:#666; font-size: 12px; margin: 0 0 14px; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .muted { color:#666; font-size: 12px; margin: 0 0 14px; }
 
-/* Tabs */
-.tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-.tab-btn {
-cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid #111;
-background:#fff; color:#111; font-weight:700; font-size:13px;
-}
-.tab-btn.active { background:#111; color:#fff; }
-.tab { display:none; }
-.tab.active { display:block; }
+    /* Tabs */
+    .tabs { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .tab-btn {
+      cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid #111;
+      background:#fff; color:#111; font-weight:700; font-size:13px;
+    }
+    .tab-btn.active { background:#111; color:#fff; }
+    .tab { display:none; }
+    .tab.active { display:block; }
 
-/* Shared layout */
-.wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-.panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
-.panel h2 { font-size: 16px; margin: 0 0 10px; }
-label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
-input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
-textarea {
-width:100%; min-height: 280px;
-font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
-white-space: pre; overflow:auto;
-}
-.preview { background:#fafafa; padding: 10px; border-radius: 8px; border:1px dashed #ccc; overflow:auto; }
-.btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
-button {
-cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111;
-background:#111; color:#fff; font-weight:700;
-}
-button.ghost { background:#fff; color:#111; }
-.note { font-size:12px; color:#444; margin-top:8px; }
+    /* Shared layout */
+    .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+    .panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; }
+    .panel h2 { font-size: 16px; margin: 0 0 10px; }
+    label { font-size: 12px; font-weight: 600; display:block; margin-top: 10px; }
+    input { width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; font-size:14px; }
+    textarea {
+      width:100%; min-height: 280px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:12px; padding:10px; border:1px solid #ccc; border-radius:8px;
+      white-space: pre; overflow:auto;
+    }
+    .preview { background:#fafafa; padding: 10px; border-radius: 8px; border:1px dashed #ccc; overflow:auto; }
+    .btns { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    button {
+      cursor:pointer; padding:8px 12px; border-radius:8px; border:1px solid #111;
+      background:#111; color:#fff; font-weight:700;
+    }
+    button.ghost { background:#fff; color:#111; }
+    .note { font-size:12px; color:#444; margin-top:8px; }
 
-/* 3-column input */
-.row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    /* 3-column input */
+    .row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
 
-/* UTM controls */
-.toggle-row { display:flex; align-items:center; gap:8px; margin-top: 6px; }
-.toggle-row input[type="checkbox"] { width:auto; transform: translateY(1px); }
-.utm-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top: 8px; }
-.utm-grid input { font-size:13px; }
-.small { font-size:12px; color:#555; margin-top:6px; }
+    /* UTM controls */
+    .toggle-row { display:flex; align-items:center; gap:8px; margin-top: 6px; }
+    .toggle-row input[type="checkbox"] { width:auto; transform: translateY(1px); }
+    .utm-grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top: 8px; }
+    .utm-grid input { font-size:13px; }
+    .small { font-size:12px; color:#555; margin-top:6px; }
 
-/* Fixed-size product card preview frame (optional; card HTML is self-contained) */
-.card-shell {
-margin-top:14px;
-width:420px;
-height:479px;
-border:1px solid #D9D9D9;
-border-radius:16px;
-overflow:hidden;
-box-shadow:0 1px 6px rgba(0,0,0,0.06);
-background:#fff;
-box-sizing:border-box;
-font-family:"Basic Sans", Arial, sans-serif;
-}
-</style>
+    /* Fixed-size product card preview frame (optional; card HTML is self-contained) */
+    .card-shell {
+      margin-top:14px;
+      width:420px;
+      height:479px;
+      border:1px solid #D9D9D9;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 1px 6px rgba(0,0,0,0.06);
+      background:#fff;
+      box-sizing:border-box;
+      font-family:"Basic Sans", Arial, sans-serif;
+    }
+  </style>
 </head>
 
 <body>
-<h1>SendGrid marketing tools</h1>
-<p class="muted">Two-tools: 3 column block for code view + “Create card” from product url.</p>
+  <h1>SendGrid marketing tools</h1>
+  <p class="muted">Two-tools: 3 column block for code view + “Create card” from product url.</p>
 
-<div class="tabs">
-<button class="tab-btn active" data-tab="tab-3col">3-column block</button>
-<button class="tab-btn" data-tab="tab-card">Create card from url</button>
-<button class="tab-btn" data-tab="tab-2recipes">2-column recipes</button>
-<button class="tab-btn" data-tab="tab-recipe-card">Create recipe card</button>
-</div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tab-3col">3-column block</button>
+    <button class="tab-btn" data-tab="tab-card">Create card from url</button>
+    <button class="tab-btn" data-tab="tab-2recipes">2-column recipes</button>
+    <button class="tab-btn" data-tab="tab-recipe-card">Create recipe card</button>
+  </div>
 
-<!-- ===================== TAB 1: 3-column generator ===================== -->
-<section id="tab-3col" class="tab active">
-<div class="wrap">
-<div class="panel">
-<h2>3-column block</h2>
+  <!-- ===================== TAB 1: 3-column generator ===================== -->
+  <section id="tab-3col" class="tab active">
+    <div class="wrap">
+      <div class="panel">
+        <h2>3-column block</h2>
 
-<!-- UTM controls -->
-<div class="toggle-row">
-<input id="utmToggle3" type="checkbox" checked />
-<label for="utmToggle3" style="margin:0;">Bæta UTM á vörutengla</label>
-</div>
-<div class="utm-grid" id="utmFields3">
-<div>
-<label style="margin-top:8px;">utm_source</label>
-<input id="utmSource3" value="sendgrid" />
-</div>
-<div>
-<label style="margin-top:8px;">utm_medium</label>
-<input id="utmMedium3" value="email" />
-</div>
-<div>
-<label style="margin-top:8px;">utm_campaign</label>
-<input id="utmCampaign3" value="marketing_single_send" />
-</div>
-</div>
-<div class="small">Ef slökkt er á þessu, fara tenglar inn óbreyttir.</div>
+        <!-- UTM controls -->
+        <div class="toggle-row">
+          <input id="utmToggle3" type="checkbox" checked />
+          <label for="utmToggle3" style="margin:0;">Bæta UTM á vörutengla</label>
+        </div>
+        <div class="utm-grid" id="utmFields3">
+          <div>
+            <label style="margin-top:8px;">utm_source</label>
+            <input id="utmSource3" value="sendgrid" />
+          </div>
+          <div>
+            <label style="margin-top:8px;">utm_medium</label>
+            <input id="utmMedium3" value="email" />
+          </div>
+          <div>
+            <label style="margin-top:8px;">utm_campaign</label>
+            <input id="utmCampaign3" value="marketing_single_send" />
+          </div>
+        </div>
+        <div class="small">Ef slökkt er á þessu, fara tenglar inn óbreyttir.</div>
 
-<div class="row3" id="inputs3col" style="margin-top:12px;"></div>
+        <div class="row3" id="inputs3col" style="margin-top:12px;"></div>
 
-<div class="btns">
-<button id="resetBtn3col" class="ghost" type="button">Hreinsa</button>
-<button id="copyBtn3col" type="button">Afrita HTML</button>
-</div>
-<div id="copyStatus3col" class="note"></div>
-</div>
+        <div class="btns">
+          <button id="resetBtn3col" class="ghost" type="button">Hreinsa</button>
+          <button id="copyBtn3col" type="button">Afrita HTML</button>
+        </div>
+        <div id="copyStatus3col" class="note"></div>
+      </div>
 
-<div class="panel">
-<h2>Forskoðun</h2>
-<div class="preview" id="preview3col"></div>
+      <div class="panel">
+        <h2>Forskoðun</h2>
+        <div class="preview" id="preview3col"></div>
 
-<h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
-<textarea id="output3col" readonly></textarea>
-</div>
-</div>
-</section>
+        <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+        <textarea id="output3col" readonly></textarea>
+      </div>
+    </div>
+  </section>
 
 <!-- ===================== TAB: 2-column recipes ===================== -->
 <section id="tab-2recipes" class="tab">
-<div class="wrap">
-<div class="panel">
-<h2>2-column recipes</h2>
+  <div class="wrap">
+    <div class="panel">
+      <h2>2-column recipes</h2>
 
-<div class="row3" id="inputs2recipes" style="margin-top:12px; grid-template-columns: repeat(2,1fr);"></div>
+      <div class="row3" id="inputs2recipes" style="margin-top:12px; grid-template-columns: repeat(2,1fr);"></div>
 
-<div class="btns">
-<button id="resetBtn2recipes" class="ghost" type="button">Hreinsa</button>
-<button id="copyBtn2recipes" type="button">Afrita HTML</button>
-</div>
-<div id="copyStatus2recipes" class="note"></div>
-</div>
+      <div class="btns">
+        <button id="resetBtn2recipes" class="ghost" type="button">Hreinsa</button>
+        <button id="copyBtn2recipes" type="button">Afrita HTML</button>
+      </div>
+      <div id="copyStatus2recipes" class="note"></div>
+    </div>
 
-<div class="panel">
-<h2>Forskoðun</h2>
-<div class="preview" id="preview2recipes"></div>
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div class="preview" id="preview2recipes"></div>
 
-<h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
-<textarea id="output2recipes" readonly></textarea>
-</div>
-</div>
+      <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+      <textarea id="output2recipes" readonly></textarea>
+    </div>
+  </div>
 </section>
 
+  
+  <!-- ===================== TAB 2: Product card builder ===================== -->
+  <section id="tab-card" class="tab">
+    <div class="wrap">
+      <div class="panel">
+        <h2>Create card from url</h2>
 
-<!-- ===================== TAB 2: Product card builder ===================== -->
-<section id="tab-card" class="tab">
-<div class="wrap">
-<div class="panel">
-<h2>Create card from url</h2>
+        <label>Product URL (kronan.is/vara/...)</label>
+        <input id="productUrlCard" placeholder="https://kronan.is/vara/100258554" />
 
-<label>Product URL (kronan.is/vara/...)</label>
-<input id="productUrlCard" placeholder="https://kronan.is/vara/100258554" />
+        <!-- NEW: optional overrides -->
+        <label>Product name (optional edit)</label>
+        <input id="manualName" placeholder="(auto-filled after Create card)" />
 
-<!-- NEW: optional overrides -->
-<label>Product name (optional edit)</label>
-<input id="manualName" placeholder="(auto-filled after Create card)" />
+        <label>Price (optional edit)</label>
+        <input id="manualPrice" placeholder="e.g. 489 kr." />
 
-<label>Price (optional edit)</label>
-<input id="manualPrice" placeholder="e.g. 489 kr." />
+        <div class="btns">
+          <button id="createBtnCard" type="button">Create card</button>
+          <button id="updateBtnCard" class="ghost" type="button">Update card</button>
+          <button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
+          <button id="downloadPngBtnCard" class="ghost" type="button">Download PNG</button>
+        </div>
 
-<div class="btns">
-<button id="createBtnCard" type="button">Create card</button>
-<button id="updateBtnCard" class="ghost" type="button">Update card</button>
-<button id="copyBtnCard" class="ghost" type="button">Copy HTML</button>
-<button id="downloadPngBtnCard" class="ghost" type="button">Download PNG</button>
-</div>
+        <div id="statusCard" class="note"></div>
+      </div>
 
-<div id="statusCard" class="note"></div>
-</div>
+      <div class="panel">
+        <h2>Forskoðun</h2>
+        <div id="previewCard"></div>
 
-<div class="panel">
-<h2>Forskoðun</h2>
-<div id="previewCard"></div>
+        <h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
+        <textarea id="outputCard" readonly></textarea>
+      </div>
+    </div>
+  </section>
 
-<h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
-<textarea id="outputCard" readonly></textarea>
-</div>
-</div>
-</section>
+  <section id="tab-recipe-card" class="tab">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Create recipe card</h2>
 
-<section id="tab-recipe-card" class="tab">
-<div class="wrap">
-<div class="panel">
-<h2>Create recipe card</h2>
+      <label>Recipe URL (kronan.is/uppskriftir/...)</label>
+      <input id="recipeUrlCard" placeholder="https://kronan.is/uppskriftir/kalkunabringa" />
 
-<label>Recipe URL (kronan.is/uppskriftir/...)</label>
-<input id="recipeUrlCard" placeholder="https://kronan.is/uppskriftir/kalkunabringa" />
+      <!-- Optional overrides -->
+      <label>Title (optional edit)</label>
+      <input id="manualRecipeTitle" placeholder="(auto-filled after Create)" />
 
-<!-- Optional overrides -->
-<label>Title (optional edit)</label>
-<input id="manualRecipeTitle" placeholder="(auto-filled after Create)" />
+      <label>Likes (optional edit)</label>
+      <input id="manualRecipeLikes" placeholder="e.g. 9" />
 
-<label>Likes (optional edit)</label>
-<input id="manualRecipeLikes" placeholder="e.g. 9" />
+      <label>Servings (optional edit)</label>
+      <input id="manualRecipeServings" placeholder="e.g. 4" />
 
-<label>Servings (optional edit)</label>
-<input id="manualRecipeServings" placeholder="e.g. 4" />
+      <label>Prep (optional edit)</label>
+      <input id="manualRecipePrep" placeholder="e.g. 40 mín." />
 
-<label>Prep (optional edit)</label>
-<input id="manualRecipePrep" placeholder="e.g. 40 mín." />
+      <label>Cook (optional edit)</label>
+      <input id="manualRecipeCook" placeholder="e.g. 50 mín." />
 
-<label>Cook (optional edit)</label>
-<input id="manualRecipeCook" placeholder="e.g. 50 mín." />
+      <label>Total (optional edit)</label>
+      <input id="manualRecipeTotal" placeholder="e.g. 130 mín." />
 
-<label>Total (optional edit)</label>
-<input id="manualRecipeTotal" placeholder="e.g. 130 mín." />
+      <div class="btns">
+        <button id="createBtnRecipe" type="button">Create recipe card</button>
+        <button id="updateBtnRecipe" class="ghost" type="button">Update card</button>
+        <button id="copyBtnRecipe" class="ghost" type="button">Copy HTML</button>
+        <button id="downloadPngBtnRecipe" class="ghost" type="button">Download PNG</button>
+      </div>
 
-<div class="btns">
-<button id="createBtnRecipe" type="button">Create recipe card</button>
-<button id="updateBtnRecipe" class="ghost" type="button">Update card</button>
-<button id="copyBtnRecipe" class="ghost" type="button">Copy HTML</button>
-<button id="downloadPngBtnRecipe" class="ghost" type="button">Download PNG</button>
-</div>
+      <div id="statusRecipe" class="note"></div>
+    </div>
 
-<div id="statusRecipe" class="note"></div>
-</div>
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div id="previewRecipe"></div>
 
-<div class="panel">
-<h2>Forskoðun</h2>
-<div id="previewRecipe"></div>
-
-<h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
-<textarea id="outputRecipe" readonly></textarea>
-</div>
-</div>
+      <h2 style="margin-top:14px;">Úttak (copy/paste)</h2>
+      <textarea id="outputRecipe" readonly></textarea>
+    </div>
+  </div>
 </section>
 
 
 <script>
 /* ===================== Tabs ===================== */
 document.querySelectorAll(".tab-btn").forEach(btn => {
-btn.addEventListener("click", () => {
-document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-btn.classList.add("active");
-document.getElementById(btn.dataset.tab).classList.add("active");
-});
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
 });
 
 /* ===================== TAB 1: 3-column generator ===================== */
 const NUM_COLUMNS = 3;
 
 const products3col = Array.from({ length: NUM_COLUMNS }, () => ({
-href: "",
-src: "",
-alt: ""
+  href: "",
+  src: "",
+  alt: ""
 }));
 
 const inputs3colEl = document.getElementById("inputs3col");
@@ -286,178 +286,178 @@ const utmCampaign3 = document.getElementById("utmCampaign3");
 const utmFields3 = document.getElementById("utmFields3");
 
 function renderInputs3col() {
-inputs3colEl.innerHTML = "";
-products3col.forEach((p, idx) => {
-const card = document.createElement("div");
-card.innerHTML = `
-     <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
-       <strong>Dálkur ${idx+1}</strong>
+  inputs3colEl.innerHTML = "";
+  products3col.forEach((p, idx) => {
+    const card = document.createElement("div");
+    card.innerHTML = `
+      <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
+        <strong>Dálkur ${idx+1}</strong>
 
-       <label>Vörutengill (href)</label>
-       <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/vara/..." value="${p.href}"/>
+        <label>Vörutengill (href)</label>
+        <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/vara/..." value="${p.href}"/>
 
-       <label>Myndatengill (src)</label>
-       <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
+        <label>Myndatengill (src)</label>
+        <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
 
-       <label>Alt text (valfrjálst)</label>
-       <input data-k="alt" data-i="${idx}" placeholder="t.d. Maiskökur" value="${p.alt}"/>
-     </div>
-   `;
-inputs3colEl.appendChild(card);
-});
+        <label>Alt text (valfrjálst)</label>
+        <input data-k="alt" data-i="${idx}" placeholder="t.d. Maiskökur" value="${p.alt}"/>
+      </div>
+    `;
+    inputs3colEl.appendChild(card);
+  });
 
-inputs3colEl.querySelectorAll("input").forEach(inp => {
-inp.addEventListener("input", e => {
-const i = Number(e.target.dataset.i);
-const k = e.target.dataset.k;
-products3col[i][k] = e.target.value.trim();
-update3col();
-});
-});
+  inputs3colEl.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const i = Number(e.target.dataset.i);
+      const k = e.target.dataset.k;
+      products3col[i][k] = e.target.value.trim();
+      update3col();
+    });
+  });
 }
 
 const TEMPLATE_3COL = String.raw`<head>
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <style>
- /* Mobile-only overrides (Gmail/Android friendly) */
- @media only screen and (max-width:640px),
-        only screen and (max-device-width:640px) {
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Mobile-only overrides (Gmail/Android friendly) */
+  @media only screen and (max-width:640px),
+         only screen and (max-device-width:640px) {
 
-   .responsive-table, [class~="responsive-table"] {
-     width: 100% !important;
-     margin: 0 auto !important;
-     padding: 0 !important; /* avoid double padding from wrapper */
-   }
+    .responsive-table, [class~="responsive-table"] {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important; /* avoid double padding from wrapper */
+    }
 
-   .column, [class~="column"] {
-     display: block !important;
-     width: 100% !important;
-     max-width: 100% !important;
-     text-align: center !important;
-     margin: 0 auto 20px !important;
-     padding: 0 !important; /* prevent compounding widths */
-   }
+    .column, [class~="column"] {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      margin: 0 auto 20px !important;
+      padding: 0 !important; /* prevent compounding widths */
+    }
 
-   /* Reliable 28px side gutters per card */
-   .mobile-pad, [class~="mobile-pad"] {
-     padding-left: 28px !important;
-     padding-right: 28px !important;
-   }
+    /* Reliable 28px side gutters per card */
+    .mobile-pad, [class~="mobile-pad"] {
+      padding-left: 28px !important;
+      padding-right: 28px !important;
+    }
 
-   .column img, [class~="column"] img {
-     width: 100% !important;
-     height: auto !important;
-     max-width: 100% !important;
-     display: block !important;
-     margin: 0 auto !important;
-   }
- }
- </style>
+    .column img, [class~="column"] img {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+      display: block !important;
+      margin: 0 auto !important;
+    }
+  }
+  </style>
 </head>
 
 <body>
- <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-   <tr>
-     <!-- First Column -->
-     <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
-       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-         <tr>
-           <!-- Mobile adds 28px L/R here -->
-           <td class="mobile-pad" style="padding:0;">
-             <a href="{{href1}}">
-               <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt1}}" src="{{src1}}">
-             </a>
-           </td>
-         </tr>
-       </table>
-     </td>
+  <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+    <tr>
+      <!-- First Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <!-- Mobile adds 28px L/R here -->
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href1}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt1}}" src="{{src1}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
 
-     <!-- Second Column -->
-     <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
-       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-         <tr>
-           <td class="mobile-pad" style="padding:0;">
-             <a href="{{href2}}">
-               <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt2}}" src="{{src2}}">
-             </a>
-           </td>
-         </tr>
-       </table>
-     </td>
+      <!-- Second Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href2}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt2}}" src="{{src2}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
 
-     <!-- Third Column -->
-     <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
-       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-         <tr>
-           <td class="mobile-pad" style="padding:0;">
-             <a href="{{href3}}">
-               <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt3}}" src="{{src3}}">
-             </a>
-           </td>
-         </tr>
-       </table>
-     </td>
-   </tr>
- </table>
+      <!-- Third Column -->
+      <td class="column" width="33.33%" valign="top" style="padding:10px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href3}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="186" alt="{{alt3}}" src="{{src3}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>`;
 
 function buildHtml3col() {
-let html = TEMPLATE_3COL;
+  let html = TEMPLATE_3COL;
 
-products3col.forEach((p, idx) => {
-const n = idx + 1;
+  products3col.forEach((p, idx) => {
+    const n = idx + 1;
 
-const finalHref = utmToggle3.checked
-? addUTM(p.href, {
-utm_source: utmSource3.value.trim(),
-utm_medium: utmMedium3.value.trim(),
-utm_campaign: utmCampaign3.value.trim()
-})
-: (p.href || "#");
+    const finalHref = utmToggle3.checked
+      ? addUTM(p.href, {
+          utm_source: utmSource3.value.trim(),
+          utm_medium: utmMedium3.value.trim(),
+          utm_campaign: utmCampaign3.value.trim()
+        })
+      : (p.href || "#");
 
-html = html
-.replaceAll(`{{href${n}}}`, finalHref || "#")
-.replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x604.png?text=Image")
-.replaceAll(`{{alt${n}}}`, escapeHtml(p.alt || ""));
-});
+    html = html
+      .replaceAll(`{{href${n}}}`, finalHref || "#")
+      .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x604.png?text=Image")
+      .replaceAll(`{{alt${n}}}`, escapeHtml(p.alt || ""));
+  });
 
-return html.trim();
+  return html.trim();
 }
 
 function update3col() {
-utmFields3.style.display = utmToggle3.checked ? "grid" : "none";
-const html = buildHtml3col();
-output3colEl.value = html;
-preview3colEl.innerHTML = html;
+  utmFields3.style.display = utmToggle3.checked ? "grid" : "none";
+  const html = buildHtml3col();
+  output3colEl.value = html;
+  preview3colEl.innerHTML = html;
 }
 
 copyBtn3col.addEventListener("click", async () => {
-try {
-await navigator.clipboard.writeText(output3colEl.value);
-copyStatus3col.textContent = "Afritað! Límdu í SendGrid Code Block.";
-setTimeout(() => copyStatus3col.textContent = "", 1500);
-} catch {
-copyStatus3col.textContent = "Gat ekki afritað — afritaðu handvirkt.";
-}
+  try {
+    await navigator.clipboard.writeText(output3colEl.value);
+    copyStatus3col.textContent = "Afritað! Límdu í SendGrid Code Block.";
+    setTimeout(() => copyStatus3col.textContent = "", 1500);
+  } catch {
+    copyStatus3col.textContent = "Gat ekki afritað — afritaðu handvirkt.";
+  }
 });
 
 resetBtn3col.addEventListener("click", () => {
-products3col.forEach(p => { p.href=""; p.src=""; p.alt=""; });
-renderInputs3col();
-update3col();
+  products3col.forEach(p => { p.href=""; p.src=""; p.alt=""; });
+  renderInputs3col();
+  update3col();
 });
 
 [utmToggle3, utmSource3, utmMedium3, utmCampaign3].forEach(el =>
-el.addEventListener("input", update3col)
+  el.addEventListener("input", update3col)
 );
 
 
-/* ===================== TAB: 2-column recipes ===================== */
+  /* ===================== TAB: 2-column recipes ===================== */
 const NUM_RECIPES = 2;
 
 const recipes2 = Array.from({ length: NUM_RECIPES }, () => ({
-href: "",
-src: ""
+  href: "",
+  src: ""
 }));
 
 const inputs2recipesEl = document.getElementById("inputs2recipes");
@@ -468,140 +468,140 @@ const resetBtn2recipes = document.getElementById("resetBtn2recipes");
 const copyStatus2recipes = document.getElementById("copyStatus2recipes");
 
 function renderInputs2recipes() {
-inputs2recipesEl.innerHTML = "";
+  inputs2recipesEl.innerHTML = "";
 
-recipes2.forEach((p, idx) => {
-const card = document.createElement("div");
-card.innerHTML = `
-     <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
-       <strong>Dálkur ${idx + 1}</strong>
+  recipes2.forEach((p, idx) => {
+    const card = document.createElement("div");
+    card.innerHTML = `
+      <div style="border:1px solid #eee;border-radius:10px;padding:10px;">
+        <strong>Dálkur ${idx + 1}</strong>
 
-       <label>Vörutengill (href)</label>
-       <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/uppskriftir/..." value="${p.href}"/>
+        <label>Vörutengill (href)</label>
+        <input data-k="href" data-i="${idx}" placeholder="https://kronan.is/uppskriftir/..." value="${p.href}"/>
 
-       <label>Myndatengill (src)</label>
-       <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
-     </div>
-   `;
-inputs2recipesEl.appendChild(card);
-});
+        <label>Myndatengill (src)</label>
+        <input data-k="src" data-i="${idx}" placeholder="http://cdn.mcauto-images...png" value="${p.src}"/>
+      </div>
+    `;
+    inputs2recipesEl.appendChild(card);
+  });
 
-inputs2recipesEl.querySelectorAll("input").forEach(inp => {
-inp.addEventListener("input", e => {
-const i = Number(e.target.dataset.i);
-const k = e.target.dataset.k;
-recipes2[i][k] = e.target.value.trim();
-update2recipes();
-});
-});
+  inputs2recipesEl.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const i = Number(e.target.dataset.i);
+      const k = e.target.dataset.k;
+      recipes2[i][k] = e.target.value.trim();
+      update2recipes();
+    });
+  });
 }
 
 // YOUR TEMPLATE KEPT VERBATIM (only href/src placeholders)
 const TEMPLATE_2RECIPES = String.raw`<head>
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <style>
- /* Mobile-only overrides (Gmail/Android friendly) */
- @media only screen and (max-width:640px),
-        only screen and (max-device-width:640px) {
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Mobile-only overrides (Gmail/Android friendly) */
+  @media only screen and (max-width:640px),
+         only screen and (max-device-width:640px) {
 
-   .responsive-table, [class~="responsive-table"] {
-     width: 100% !important;
-     margin: 0 auto !important;
-     padding: 0 !important; /* avoid double padding from wrapper */
-   }
+    .responsive-table, [class~="responsive-table"] {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important; /* avoid double padding from wrapper */
+    }
 
-   .column, [class~="column"] {
-     display: block !important;
-     width: 100% !important;
-     max-width: 100% !important;
-     text-align: center !important;
-     margin: 0 auto 10px !important;
-     padding: 0 !important; /* prevent compounding widths */
-   }
+    .column, [class~="column"] {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      margin: 0 auto 10px !important;
+      padding: 0 !important; /* prevent compounding widths */
+    }
 
-   /* Reliable 28px side gutters per card */
-   .mobile-pad, [class~="mobile-pad"] {
-     padding-left: 12px !important;
-     padding-right: 12px !important;
-   }
+    /* Reliable 28px side gutters per card */
+    .mobile-pad, [class~="mobile-pad"] {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
 
-   .column img, [class~="column"] img {
-     width: 100% !important;
-     height: auto !important;
-     max-width: 100% !important;
-     display: block !important;
-     margin: 0 auto !important;
-   }
- }
- </style>
+    .column img, [class~="column"] img {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100% !important;
+      display: block !important;
+      margin: 0 auto !important;
+    }
+  }
+  </style>
 </head>
 
 <body>
- <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-   <tr>
-     <!-- First Column -->
-     <td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
-       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-         <tr>
-           <!-- Mobile adds 28px L/R here -->
-           <td class="mobile-pad" style="padding:0;">
-             <a href="{{href1}}">
-               <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maiskokur" src="{{src1}}">
-             </a>
-           </td>
-         </tr>
-       </table>
-     
+  <table class="responsive-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+    <tr>
+      <!-- First Column -->
+      <td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <!-- Mobile adds 28px L/R here -->
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href1}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maiskokur" src="{{src1}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      
 
-     <!-- Second Column -->
-     </td><td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
-       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-         <tr>
-           <td class="mobile-pad" style="padding:0;">
-             <a href="{{href2}}">
-               <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maískokur" src="{{src2}}">
-             </a>
-           </td>
-         </tr>
-       </table>
-     </td>
-   
- </tr></table>
+      <!-- Second Column -->
+      </td><td class="column" width="48%" valign="top" style="padding:12px; font-size:14px; line-height:20px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td class="mobile-pad" style="padding:0;">
+              <a href="{{href2}}">
+                <img border="0" style="display:block; max-width:100%; width:100%; height:auto;" width="300" alt="Maískokur" src="{{src2}}">
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    
+  </tr></table>
 </body>`;
 
 function buildHtml2recipes() {
-let html = TEMPLATE_2RECIPES;
+  let html = TEMPLATE_2RECIPES;
 
-recipes2.forEach((p, idx) => {
-const n = idx + 1;
-html = html
-.replaceAll(`{{href${n}}}`, p.href || "#")
-.replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x517.png?text=Recipe");
-});
+  recipes2.forEach((p, idx) => {
+    const n = idx + 1;
+    html = html
+      .replaceAll(`{{href${n}}}`, p.href || "#")
+      .replaceAll(`{{src${n}}}`, p.src || "https://via.placeholder.com/512x517.png?text=Recipe");
+  });
 
-return html.trim();
+  return html.trim();
 }
 
 function update2recipes() {
-const html = buildHtml2recipes();
-output2recipesEl.value = html;
-preview2recipesEl.innerHTML = html;
+  const html = buildHtml2recipes();
+  output2recipesEl.value = html;
+  preview2recipesEl.innerHTML = html;
 }
 
 copyBtn2recipes.addEventListener("click", async () => {
-try {
-await navigator.clipboard.writeText(output2recipesEl.value);
-copyStatus2recipes.textContent = "Afritað! Límdu í SendGrid Code Block.";
-setTimeout(() => copyStatus2recipes.textContent = "", 1500);
-} catch {
-copyStatus2recipes.textContent = "Gat ekki afritað — afritaðu handvirkt.";
-}
+  try {
+    await navigator.clipboard.writeText(output2recipesEl.value);
+    copyStatus2recipes.textContent = "Afritað! Límdu í SendGrid Code Block.";
+    setTimeout(() => copyStatus2recipes.textContent = "", 1500);
+  } catch {
+    copyStatus2recipes.textContent = "Gat ekki afritað — afritaðu handvirkt.";
+  }
 });
 
 resetBtn2recipes.addEventListener("click", () => {
-recipes2.forEach(p => { p.href = ""; p.src = ""; });
-renderInputs2recipes();
-update2recipes();
+  recipes2.forEach(p => { p.href = ""; p.src = ""; });
+  renderInputs2recipes();
+  update2recipes();
 });
 
 /* Init */
@@ -611,11 +611,11 @@ update2recipes();
 /* ===================== TAB 2: Card builder ===================== */
 /* EDIT THIS if your Worker URL changes */
 const PROXY_URL =
-"https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/?url=";
+  "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/?url=";
 const IMG_PROXY_URL =
-"https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/img?url=";
+  "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/img?url=";
 const RECIPE_PROXY_URL =
-"https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/recipe?url=";
+  "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev/recipe?url=";
 
 const productUrlCardEl = document.getElementById("productUrlCard");
 const createBtnCard = document.getElementById("createBtnCard");
@@ -632,255 +632,255 @@ const updateBtnCard = document.getElementById("updateBtnCard");
 let lastProductData = null;
 
 function getMergedCardData() {
-if (!lastProductData) return null;
+  if (!lastProductData) return null;
 
-const nameOverride = manualNameEl.value.trim();
-const priceOverride = manualPriceEl.value.trim();
+  const nameOverride = manualNameEl.value.trim();
+  const priceOverride = manualPriceEl.value.trim();
 
-const merged = { ...lastProductData };
+  const merged = { ...lastProductData };
 
-if (nameOverride) merged.name = nameOverride;
+  if (nameOverride) merged.name = nameOverride;
 
-if (priceOverride) {
-// keep consistent; renderer uses priceNew for discount if present
-merged.price = priceOverride;
-if (merged.priceNew) merged.priceNew = priceOverride;
-}
+  if (priceOverride) {
+    // keep consistent; renderer uses priceNew for discount if present
+    merged.price = priceOverride;
+    if (merged.priceNew) merged.priceNew = priceOverride;
+  }
 
-return merged;
+  return merged;
 }
 
 function renderCardFromState() {
-const merged = getMergedCardData();
-if (!merged) return;
+  const merged = getMergedCardData();
+  if (!merged) return;
 
-const cardHtml = buildCardHtml(merged);
-outputCardEl.value = cardHtml;
-previewCardEl.innerHTML = cardHtml;
+  const cardHtml = buildCardHtml(merged);
+  outputCardEl.value = cardHtml;
+  previewCardEl.innerHTML = cardHtml;
 }
 
 createBtnCard.addEventListener("click", async () => {
-const url = productUrlCardEl.value.trim();
-if (!url) return setStatusCard("Settu inn slóð.", true);
+  const url = productUrlCardEl.value.trim();
+  if (!url) return setStatusCard("Settu inn slóð.", true);
 
-setStatusCard("Sæki vöru…", false);
-previewCardEl.innerHTML = "";
-outputCardEl.value = "";
+  setStatusCard("Sæki vöru…", false);
+  previewCardEl.innerHTML = "";
+  outputCardEl.value = "";
 
-try {
-const data = await fetch(PROXY_URL + encodeURIComponent(url)).then(r => r.json());
+  try {
+    const data = await fetch(PROXY_URL + encodeURIComponent(url)).then(r => r.json());
 
-if (!data?.name || !data?.price || !data?.image) {
-throw new Error("Missing fields in JSON");
-}
+    if (!data?.name || !data?.price || !data?.image) {
+      throw new Error("Missing fields in JSON");
+    }
 
-lastProductData = data;
+    lastProductData = data;
 
-// Prefill editable fields
-manualNameEl.value = data.name || "";
-manualPriceEl.value = (data.priceNew || data.price) || "";
+    // Prefill editable fields
+    manualNameEl.value = data.name || "";
+    manualPriceEl.value = (data.priceNew || data.price) || "";
 
-renderCardFromState();
+    renderCardFromState();
 
-setStatusCard("Tilbúið ✅", false);
-} catch (e) {
-console.error(e);
-setStatusCard("Tókst ekki að sækja vöru. Athugaðu slóð eða proxy.", true);
-}
+    setStatusCard("Tilbúið ✅", false);
+  } catch (e) {
+    console.error(e);
+    setStatusCard("Tókst ekki að sækja vöru. Athugaðu slóð eða proxy.", true);
+  }
 });
 
 updateBtnCard.addEventListener("click", () => {
-if (!lastProductData) return setStatusCard("Búðu fyrst til kort með slóð.", true);
-renderCardFromState();
-setStatusCard("Uppfært ✅", false);
-setTimeout(()=>setStatusCard("",false), 1200);
+  if (!lastProductData) return setStatusCard("Búðu fyrst til kort með slóð.", true);
+  renderCardFromState();
+  setStatusCard("Uppfært ✅", false);
+  setTimeout(()=>setStatusCard("",false), 1200);
 });
 
 /* Optional: live update as you type */
 [manualNameEl, manualPriceEl].forEach(el => {
-el.addEventListener("input", () => {
-if (!lastProductData) return;
-renderCardFromState();
-});
+  el.addEventListener("input", () => {
+    if (!lastProductData) return;
+    renderCardFromState();
+  });
 });
 
 copyBtnCard.addEventListener("click", async () => {
-if (!outputCardEl.value) return;
-try {
-await navigator.clipboard.writeText(outputCardEl.value);
-setStatusCard("Afritað HTML ✅", false);
-setTimeout(()=>setStatusCard("",false), 1200);
-} catch {
-setStatusCard("Gat ekki afritað — afritaðu handvirkt.", true);
-}
+  if (!outputCardEl.value) return;
+  try {
+    await navigator.clipboard.writeText(outputCardEl.value);
+    setStatusCard("Afritað HTML ✅", false);
+    setTimeout(()=>setStatusCard("",false), 1200);
+  } catch {
+    setStatusCard("Gat ekki afritað — afritaðu handvirkt.", true);
+  }
 });
 
 downloadPngBtnCard.addEventListener("click", async () => {
-const node = previewCardEl.firstElementChild; // the card div
-if (!node) {
-setStatusCard("Engin kort til að sækja. Búðu fyrst til kort.", true);
-return;
-}
+  const node = previewCardEl.firstElementChild; // the card div
+  if (!node) {
+    setStatusCard("Engin kort til að sækja. Búðu fyrst til kort.", true);
+    return;
+  }
 
-setStatusCard("Bý til PNG…", false);
+  setStatusCard("Bý til PNG…", false);
 
-try {
-if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-const canvas = await html2canvas(node, {
-backgroundColor: null,
-scale: 1,
-useCORS: true
-});
+    const canvas = await html2canvas(node, {
+      backgroundColor: null,
+      scale: 1,
+      useCORS: true
+    });
 
-// --- Rounded corner mask (8px) ---
-const w = canvas.width;
-const h = canvas.height;
-const r = 16; // corner radius
+    // --- Rounded corner mask (8px) ---
+    const w = canvas.width;
+    const h = canvas.height;
+    const r = 16; // corner radius
 
-const out = document.createElement("canvas");
-out.width = w;
-out.height = h;
+    const out = document.createElement("canvas");
+    out.width = w;
+    out.height = h;
 
-const ctx = out.getContext("2d");
-ctx.clearRect(0, 0, w, h);
+    const ctx = out.getContext("2d");
+    ctx.clearRect(0, 0, w, h);
 
-// Rounded-rect clip path
-ctx.beginPath();
-ctx.moveTo(r, 0);
-ctx.arcTo(w, 0, w, h, r);
-ctx.arcTo(w, h, 0, h, r);
-ctx.arcTo(0, h, 0, 0, r);
-ctx.arcTo(0, 0, w, 0, r);
-ctx.closePath();
-ctx.clip();
+    // Rounded-rect clip path
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(w, 0, w, h, r);
+    ctx.arcTo(w, h, 0, h, r);
+    ctx.arcTo(0, h, 0, 0, r);
+    ctx.arcTo(0, 0, w, 0, r);
+    ctx.closePath();
+    ctx.clip();
 
-ctx.drawImage(canvas, 0, 0);
+    ctx.drawImage(canvas, 0, 0);
 
-const dataUrl = out.toDataURL("image/png");
-const a = document.createElement("a");
-a.href = dataUrl;
-a.download = `product-card-${Date.now()}.png`;
-document.body.appendChild(a);
-a.click();
-a.remove();
+    const dataUrl = out.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `product-card-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-setStatusCard("PNG sótt ✅", false);
-setTimeout(() => setStatusCard("", false), 1200);
-} catch (e) {
-console.error(e);
-setStatusCard("Tókst ekki að búa til PNG.", true);
-}
+    setStatusCard("PNG sótt ✅", false);
+    setTimeout(() => setStatusCard("", false), 1200);
+  } catch (e) {
+    console.error(e);
+    setStatusCard("Tókst ekki að búa til PNG.", true);
+  }
 });
 
 
 function buildCardHtml(p) {
-// Card size (must match .card-shell)
-const CARD_W = 420;
-const CARD_H = 479;
+  // Card size (must match .card-shell)
+  const CARD_W = 420;
+  const CARD_H = 479;
 
-// Layout tuned for 420×479
-const PADDING = 40;
-const GAP_AFTER_IMAGE = 12;
-const IMAGE_AREA_HEIGHT = 255;
-const PRICE_FONT_SIZE = 22;                 // matches your current price font-size
-const INFO_ICON_SIZE = Math.round(PRICE_FONT_SIZE * 1.5); // ~1.5x
+  // Layout tuned for 420×479
+  const PADDING = 40;
+  const GAP_AFTER_IMAGE = 12;
+  const IMAGE_AREA_HEIGHT = 255;
+  const PRICE_FONT_SIZE = 22;                 // matches your current price font-size
+  const INFO_ICON_SIZE = Math.round(PRICE_FONT_SIZE * 1.5); // ~1.5x
 
 
-const imgSrc = IMG_PROXY_URL + encodeURIComponent(p.image);
-const hasDiscount = !!(p.priceOld && p.priceNew);
-const newPriceText = hasDiscount ? p.priceNew : p.price;
+  const imgSrc = IMG_PROXY_URL + encodeURIComponent(p.image);
+  const hasDiscount = !!(p.priceOld && p.priceNew);
+  const newPriceText = hasDiscount ? p.priceNew : p.price;
+  
+  const oldPriceHtml = hasDiscount
+    ? `<span style="
+          font-family:'Basic Sans', Arial, sans-serif;
+          font-size:14px;
+          font-weight:600;
+          color:#787878;
+          text-decoration:line-through;
+          margin-right:10px;
+        ">${escapeHtml(p.priceOld)}</span>`
+    : "";
 
-const oldPriceHtml = hasDiscount
-? `<span style="
-         font-family:'Basic Sans', Arial, sans-serif;
-         font-size:14px;
-         font-weight:600;
-         color:#787878;
-         text-decoration:line-through;
-         margin-right:10px;
-       ">${escapeHtml(p.priceOld)}</span>`
-: "";
-
-return `
+  return `
 <div style="
- width:${CARD_W}px;
- height:${CARD_H}px;
- border:1px solid #D9D9D9;
- border-radius:8px;
- overflow:hidden;
- background:#ffffff;
- box-sizing:border-box;
- font-family:'Basic Sans', Arial, sans-serif;
- padding:${PADDING}px;
- display:flex;
- flex-direction:column;
+  width:${CARD_W}px;
+  height:${CARD_H}px;
+  border:1px solid #D9D9D9;
+  border-radius:8px;
+  overflow:hidden;
+  background:#ffffff;
+  box-sizing:border-box;
+  font-family:'Basic Sans', Arial, sans-serif;
+  padding:${PADDING}px;
+  display:flex;
+  flex-direction:column;
 ">
 
 <!-- Image area -->
 <div style="
- height:${IMAGE_AREA_HEIGHT}px;
- display:flex;
- align-items:center;
- justify-content:center;
- overflow:hidden;
- margin-bottom:${GAP_AFTER_IMAGE}px;
- margin-top:22px;
+  height:${IMAGE_AREA_HEIGHT}px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  margin-bottom:${GAP_AFTER_IMAGE}px;
+  margin-top:22px;
 ">
- <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
-      style="
-        max-width:100%;
-        max-height:100%;
-        object-fit:contain;
-        display:block;
-        border:0;
-      " />
+  <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
+       style="
+         max-width:100%;
+         max-height:100%;
+         object-fit:contain;
+         display:block;
+         border:0;
+       " />
 </div>
 
- <!-- Text area pinned to bottom -->
- <div style="margin-top:auto;">
-   <div style="
-     font-family:'Basic Sans', Arial, sans-serif;
-     font-size:28px;
-     font-weight:700;
-     line-height:1.2;
-     color:#111111;
-     margin:0 0 22px 0;
-     word-break:break-word;
-   ">
-     ${escapeHtml(p.name)}
-   </div>
+  <!-- Text area pinned to bottom -->
+  <div style="margin-top:auto;">
+    <div style="
+      font-family:'Basic Sans', Arial, sans-serif;
+      font-size:28px;
+      font-weight:700;
+      line-height:1.2;
+      color:#111111;
+      margin:0 0 22px 0;
+      word-break:break-word;
+    ">
+      ${escapeHtml(p.name)}
+    </div>
 
 <div style="
- display:flex;
- align-items:flex-end;
- justify-content:space-between;
- gap:12px;
- margin-bottom:22px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:22px;
 ">
- <!-- Price (left) -->
- <div style="line-height:1.2;">
-   ${oldPriceHtml}
-   <span style="
-     font-family:'Basic Sans', Arial, sans-serif;
-     font-size:${PRICE_FONT_SIZE}px;
-     font-weight:500;
-     color:#787878;
-   ">
-     ${escapeHtml(newPriceText)}
-   </span>
- </div>
+  <!-- Price (left) -->
+  <div style="line-height:1.2;">
+    ${oldPriceHtml}
+    <span style="
+      font-family:'Basic Sans', Arial, sans-serif;
+      font-size:${PRICE_FONT_SIZE}px;
+      font-weight:500;
+      color:#787878;
+    ">
+      ${escapeHtml(newPriceText)}
+    </span>
+  </div>
 
- <!-- Info icon (right) -->
- <div style="
-   width:${INFO_ICON_SIZE}px;
-   height:${INFO_ICON_SIZE}px;
-   flex:0 0 ${INFO_ICON_SIZE}px;
-   display:flex;
-   align-items:center;
-   justify-content:center;
- " aria-label="Info">
-   <!-- inline SVG so it works in PNG export + copied HTML -->
+  <!-- Info icon (right) -->
+  <div style="
+    width:${INFO_ICON_SIZE}px;
+    height:${INFO_ICON_SIZE}px;
+    flex:0 0 ${INFO_ICON_SIZE}px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  " aria-label="Info">
+    <!-- inline SVG so it works in PNG export + copied HTML -->
 
 <svg width="42" height="42" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_10192_6996)">
@@ -901,39 +901,39 @@ return `
 </defs>
 </svg>
 
- </div>
+  </div>
 </div>
 
 `.trim();
 }
 
 function setStatusCard(msg, isError){
-statusCardEl.textContent = msg;
-statusCardEl.style.color = isError ? "#b00020" : "#333";
+  statusCardEl.textContent = msg;
+  statusCardEl.style.color = isError ? "#b00020" : "#333";
 }
 
 /* ===================== Helpers ===================== */
 function escapeHtml(str) {
-return String(str)
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function addUTM(url, utmObj) {
-if (!url) return "#";
-try {
-const u = new URL(url);
-Object.entries(utmObj).forEach(([k, v]) => {
-if (!v) return;
-if (!u.searchParams.has(k)) u.searchParams.set(k, v);
-});
-return u.toString();
-} catch {
-return url;
-}
+  if (!url) return "#";
+  try {
+    const u = new URL(url);
+    Object.entries(utmObj).forEach(([k, v]) => {
+      if (!v) return;
+      if (!u.searchParams.has(k)) u.searchParams.set(k, v);
+    });
+    return u.toString();
+  } catch {
+    return url;
+  }
 }
 
 /* ===================== TAB 3: Recipe card builder ===================== */
@@ -956,271 +956,265 @@ const manualRecipeTotalEl = document.getElementById("manualRecipeTotal");
 let lastRecipeData = null;
 
 function setStatusRecipe(msg, isError){
-statusRecipeEl.textContent = msg;
-statusRecipeEl.style.color = isError ? "#b00020" : "#333";
+  statusRecipeEl.textContent = msg;
+  statusRecipeEl.style.color = isError ? "#b00020" : "#333";
 }
 
 function mergedRecipeData() {
-if (!lastRecipeData) return null;
-const m = { ...lastRecipeData };
+  if (!lastRecipeData) return null;
+  const m = { ...lastRecipeData };
 
-const v = (el) => (el?.value || "").trim();
+  const v = (el) => (el?.value || "").trim();
 
-if (v(manualRecipeTitleEl)) m.title = v(manualRecipeTitleEl);
-if (v(manualRecipeLikesEl)) m.likes = v(manualRecipeLikesEl);
-if (v(manualRecipeServingsEl)) m.servings = v(manualRecipeServingsEl);
-if (v(manualRecipePrepEl)) m.prep = v(manualRecipePrepEl);
-if (v(manualRecipeCookEl)) m.cook = v(manualRecipeCookEl);
-if (v(manualRecipeTotalEl)) m.total = v(manualRecipeTotalEl);
+  if (v(manualRecipeTitleEl)) m.title = v(manualRecipeTitleEl);
+  if (v(manualRecipeLikesEl)) m.likes = v(manualRecipeLikesEl);
+  if (v(manualRecipeServingsEl)) m.servings = v(manualRecipeServingsEl);
+  if (v(manualRecipePrepEl)) m.prep = v(manualRecipePrepEl);
+  if (v(manualRecipeCookEl)) m.cook = v(manualRecipeCookEl);
+  if (v(manualRecipeTotalEl)) m.total = v(manualRecipeTotalEl);
 
-return m;
+  return m;
 }
 
 function renderRecipeFromState() {
-const data = mergedRecipeData();
-if (!data) return;
+  const data = mergedRecipeData();
+  if (!data) return;
 
-const html = buildRecipeCardHtml(data);
-outputRecipeEl.value = html;
-previewRecipeEl.innerHTML = html;
+  const html = buildRecipeCardHtml(data);
+  outputRecipeEl.value = html;
+  previewRecipeEl.innerHTML = html;
 }
 
 createBtnRecipe.addEventListener("click", async () => {
-const url = recipeUrlCardEl.value.trim();
-if (!url) return setStatusRecipe("Settu inn slóð.", true);
+  const url = recipeUrlCardEl.value.trim();
+  if (!url) return setStatusRecipe("Settu inn slóð.", true);
 
-setStatusRecipe("Sæki uppskrift…", false);
-previewRecipeEl.innerHTML = "";
-outputRecipeEl.value = "";
+  setStatusRecipe("Sæki uppskrift…", false);
+  previewRecipeEl.innerHTML = "";
+  outputRecipeEl.value = "";
 
-try {
-const data = await fetch(RECIPE_PROXY_URL + encodeURIComponent(url)).then(r => r.json());
+  try {
+    const data = await fetch(RECIPE_PROXY_URL + encodeURIComponent(url)).then(r => r.json());
 
-if (!data?.title || !data?.image) throw new Error("Missing fields (title/image)");
+    if (!data?.title || !data?.image) throw new Error("Missing fields (title/image)");
 
-lastRecipeData = data;
+    lastRecipeData = data;
 
-// Prefill
-manualRecipeTitleEl.value = data.title || "";
-manualRecipeLikesEl.value = data.likes || "";
-manualRecipeServingsEl.value = data.servings || "";
-manualRecipePrepEl.value = data.prep || "";
-manualRecipeCookEl.value = data.cook || "";
-manualRecipeTotalEl.value = data.total || "";
+    // Prefill
+    manualRecipeTitleEl.value = data.title || "";
+    manualRecipeLikesEl.value = data.likes || "";
+    manualRecipeServingsEl.value = data.servings || "";
+    manualRecipePrepEl.value = data.prep || "";
+    manualRecipeCookEl.value = data.cook || "";
+    manualRecipeTotalEl.value = data.total || "";
 
-renderRecipeFromState();
-setStatusRecipe("Tilbúið ✅", false);
-} catch (e) {
-console.error(e);
-setStatusRecipe("Tókst ekki að sækja uppskrift. Athugaðu slóð eða proxy.", true);
-}
+    renderRecipeFromState();
+    setStatusRecipe("Tilbúið ✅", false);
+  } catch (e) {
+    console.error(e);
+    setStatusRecipe("Tókst ekki að sækja uppskrift. Athugaðu slóð eða proxy.", true);
+  }
 });
 
 updateBtnRecipe.addEventListener("click", () => {
-if (!lastRecipeData) return setStatusRecipe("Búðu fyrst til kort með slóð.", true);
-renderRecipeFromState();
-setStatusRecipe("Uppfært ✅", false);
-setTimeout(()=>setStatusRecipe("",false), 1200);
+  if (!lastRecipeData) return setStatusRecipe("Búðu fyrst til kort með slóð.", true);
+  renderRecipeFromState();
+  setStatusRecipe("Uppfært ✅", false);
+  setTimeout(()=>setStatusRecipe("",false), 1200);
 });
 
 [manualRecipeTitleEl, manualRecipeLikesEl, manualRecipeServingsEl, manualRecipePrepEl, manualRecipeCookEl, manualRecipeTotalEl]
-.forEach(el => el.addEventListener("input", () => { if (lastRecipeData) renderRecipeFromState(); }));
+  .forEach(el => el.addEventListener("input", () => { if (lastRecipeData) renderRecipeFromState(); }));
 
 copyBtnRecipe.addEventListener("click", async () => {
-if (!outputRecipeEl.value) return;
-try {
-await navigator.clipboard.writeText(outputRecipeEl.value);
-setStatusRecipe("Afritað HTML ✅", false);
-setTimeout(()=>setStatusRecipe("",false), 1200);
-} catch {
-setStatusRecipe("Gat ekki afritað — afritaðu handvirkt.", true);
-}
+  if (!outputRecipeEl.value) return;
+  try {
+    await navigator.clipboard.writeText(outputRecipeEl.value);
+    setStatusRecipe("Afritað HTML ✅", false);
+    setTimeout(()=>setStatusRecipe("",false), 1200);
+  } catch {
+    setStatusRecipe("Gat ekki afritað — afritaðu handvirkt.", true);
+  }
 });
 
 downloadPngBtnRecipe.addEventListener("click", async () => {
-const node = previewRecipeEl.firstElementChild;
-if (!node) return setStatusRecipe("Engin kort til að sækja. Búðu fyrst til kort.", true);
+  const node = previewRecipeEl.firstElementChild;
+  if (!node) return setStatusRecipe("Engin kort til að sækja. Búðu fyrst til kort.", true);
 
-setStatusRecipe("Bý til PNG…", false);
+  setStatusRecipe("Bý til PNG…", false);
 
-try {
-if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-const canvas = await html2canvas(node, {
-backgroundColor: null,
-scale: 1,
-useCORS: true
-});
+    const canvas = await html2canvas(node, {
+      backgroundColor: null,
+      scale: 1,
+      useCORS: true
+    });
 
-// Rounded corner mask (matches card radius)
-const w = canvas.width, h = canvas.height;
-const r = 16; // your design looks like 16px; change if needed
+    // Rounded corner mask (matches card radius)
+    const w = canvas.width, h = canvas.height;
+    const r = 16; // your design looks like 16px; change if needed
 
-const out = document.createElement("canvas");
-out.width = w; out.height = h;
-const ctx = out.getContext("2d");
+    const out = document.createElement("canvas");
+    out.width = w; out.height = h;
+    const ctx = out.getContext("2d");
 
-ctx.clearRect(0, 0, w, h);
-ctx.beginPath();
-ctx.moveTo(r, 0);
-ctx.arcTo(w, 0, w, h, r);
-ctx.arcTo(w, h, 0, h, r);
-ctx.arcTo(0, h, 0, 0, r);
-ctx.arcTo(0, 0, w, 0, r);
-ctx.closePath();
-ctx.clip();
-ctx.drawImage(canvas, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arcTo(w, 0, w, h, r);
+    ctx.arcTo(w, h, 0, h, r);
+    ctx.arcTo(0, h, 0, 0, r);
+    ctx.arcTo(0, 0, w, 0, r);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(canvas, 0, 0);
 
-const dataUrl = out.toDataURL("image/png");
-const a = document.createElement("a");
-a.href = dataUrl;
-a.download = `recipe-card-${Date.now()}.png`;
-document.body.appendChild(a);
-a.click();
-a.remove();
+    const dataUrl = out.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `recipe-card-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-setStatusRecipe("PNG sótt ✅", false);
-setTimeout(() => setStatusRecipe("", false), 1200);
-} catch (e) {
-console.error(e);
-setStatusRecipe("Tókst ekki að búa til PNG.", true);
-}
+    setStatusRecipe("PNG sótt ✅", false);
+    setTimeout(() => setStatusRecipe("", false), 1200);
+  } catch (e) {
+    console.error(e);
+    setStatusRecipe("Tókst ekki að búa til PNG.", true);
+  }
 });
 
 function buildRecipeCardHtml(d) {
-// Fixed size per your requirement
-const CARD_W = 512;
-const CARD_H = 517;
-const RADIUS = 16;
-const BORDER = "#D9D9D9";
+  // Fixed size per your requirement
+  const CARD_W = 512;
+  const CARD_H = 517;
+  const RADIUS = 16;
+  const BORDER = "#D9D9D9";
 
-// Image via IMG proxy for PNG export reliability
-const imgSrc = IMG_PROXY_URL + encodeURIComponent(d.image);
+  // Image via IMG proxy for PNG export reliability
+  const imgSrc = IMG_PROXY_URL + encodeURIComponent(d.image);
 
-// Safe fallbacks
-const likes = d.likes || "";
-const servings = d.servings || "";
-const prep = d.prep || "";
-const cook = d.cook || "";
-const total = d.total || "";
-const title = d.title || "";
+  // Safe fallbacks
+  const likes = d.likes || "";
+  const servings = d.servings || "";
+  const prep = d.prep || "";
+  const cook = d.cook || "";
+  const total = d.total || "";
+  const title = d.title || "";
 
-return `
+  return `
 <div style="
- width:${CARD_W}px;
- height:${CARD_H}px;
- border:1px solid ${BORDER};
- border-radius:${RADIUS}px;
- overflow:hidden;
- background:#ffffff;
- box-sizing:border-box;
- font-family:'Basic Sans', Arial, sans-serif;
+  width:${CARD_W}px;
+  height:${CARD_H}px;
+  border:1px solid ${BORDER};
+  border-radius:${RADIUS}px;
+  overflow:hidden;
+  background:#ffffff;
+  box-sizing:border-box;
+  font-family:'Basic Sans', Arial, sans-serif;
 ">
 
- <!-- Top image area -->
- <div style="
-   position:relative;
-   height:300px;
-   width:100%;
-   overflow:hidden;
- ">
-   <img src="${imgSrc}" alt="${escapeHtml(title)}" style="
-     width:100%;
-     height:100%;
-     object-fit:cover;
-     display:block;
-     border:0;
-   "/>
+  <!-- Top image area -->
+  <div style="
+    position:relative;
+    height:300px;
+    width:100%;
+    overflow:hidden;
+  ">
+    <img src="${imgSrc}" alt="${escapeHtml(title)}" style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      border:0;
+    "/>
 
-   <!-- Likes pill -->
-   <div style="
-     position:absolute;
-     left:16px;
-     top:16px;
-     background:#fff;
-     border-radius:12px;
-     padding:8px 12px;
-     display:flex;
-     align-items:center;
-     gap:8px;
-     box-shadow:0 2px 10px rgba(0,0,0,0.12);
-     font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-     font-weight:700;
-     color:#111;
-   ">
-     <svg width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-       <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
-     </svg>
-     <span>${escapeHtml(likes)}</span>
-   </div>
- </div>
+    <!-- Likes pill -->
+    <div style="
+      position:absolute;
+      left:16px;
+      top:16px;
+      background:#fff;
+      border-radius:12px;
+      padding:8px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.12);
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-weight:700;
+      color:#111;
+    ">
+      <svg width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
+      </svg>
+      <span>${escapeHtml(likes)}</span>
+    </div>
+  </div>
 
- <!-- Bottom content -->
- <div style="
-   height:calc(${CARD_H}px - 300px);
-   padding:22px 24px 18px 24px;
-   box-sizing:border-box;
-   display:flex;
-   flex-direction:column;
-   justify-content:space-between;
- ">
-   <div style="
-     font-size:28px;
-     font-weight:700;
-     line-height:1.15;
-     color:#111;
-     margin:0;
-   ">
-     ${escapeHtml(title)}
-   </div>
+  <!-- Bottom content -->
+  <div style="
+    height:calc(${CARD_H}px - 300px);
+    padding:22px 24px 18px 24px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  ">
+    <div style="
+      font-size:28px;
+      font-weight:700;
+      line-height:1.15;
+      color:#111;
+      margin:0;
+    ">
+      ${escapeHtml(title)}
+    </div>
 
-   <div style="height:1px;background:#E6E6E6;margin:14px 0 14px 0;"></div>
+    <div style="height:1px;background:#E6E6E6;margin:14px 0 14px 0;"></div>
 
-   <div style="
-     display:flex;
-     gap:18px;
-     justify-content:space-between;
-     align-items:flex-end;
-   ">
-     ${metaBlock("Undirbúningur", prep, "whisk")}
-     ${metaBlock("Eldunartími", cook, "pot")}
-     ${metaBlock("Samtals", total, "chef")}
-   </div>
- </div>
+    <div style="
+      display:flex;
+      gap:18px;
+      justify-content:space-between;
+      align-items:flex-end;
+    ">
+      ${metaBlock("Undirbúningur", prep, "whisk")}
+      ${metaBlock("Eldunartími", cook, "pot")}
+      ${metaBlock("Samtals", total, "chef")}
+    </div>
+  </div>
 </div>
 `.trim();
 }
 
 function metaBlock(label, value, icon) {
-return `
- <div style="flex:1;min-width:0;">
-   <div style="
-     font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-     font-size:16px;
-     color:#111;
-     margin-bottom:10px;
-   ">${escapeHtml(label)}</div>
+  return `
+  <div style="flex:1;min-width:0;">
+    <div style="
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-size:16px;
+      color:#111;
+      margin-bottom:10px;
+    ">${escapeHtml(label)}</div>
 
-   <div style="display:flex;align-items:center;gap:10px;">
-     ${iconSvg(icon)}
-     <div style="
-       font-family:'Basic Sans', Arial, sans-serif;
-       font-size:18px;
-       font-weight:500;
-       color:#111;
-     ">${escapeHtml(value)}</div>
-   </div>
- </div>
- `;
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${iconSvg(icon)}
+      <div style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:18px;
+        font-weight:500;
+        color:#111;
+      ">${escapeHtml(value)}</div>
+    </div>
+  </div>
+  `;
 }
 
 function iconSvg(kind) {
-  // Simple inline icons (PNG export friendly). Adjust if you have exact SVG assets.
-  if (kind === "whisk") {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 19c3-2 7-1 10-4 3-3 2-7 4-10" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M6 18l-2 2" stroke="#00D6D6" stroke-width="4" stroke-linecap="round"/>
-    </svg>`;
   if (kind === "whisk") { // Undirbúningur
     return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11.5088 9.47681H1.92234C0.856242 9.47681 0 10.3414 0 11.3991C0 12.4568 0.864636 13.3215 1.92234 13.3215H11.5088C12.5749 13.3215 13.4311 12.4568 13.4311 11.3991C13.4311 10.3414 12.5665 9.47681 11.5088 9.47681Z" fill="#00C6CC"/>
@@ -1230,13 +1224,7 @@ function iconSvg(kind) {
 <path d="M2.71143 10.5345C2.6023 10.5345 2.48479 10.4926 2.40924 10.4002C2.24974 10.2323 2.25813 9.96371 2.42602 9.80422L8.0671 4.52411C8.23498 4.36461 8.5036 4.373 8.66309 4.54089C8.82259 4.70878 8.8142 4.9774 8.64631 5.1369L3.00524 10.417C2.92129 10.4926 2.82056 10.5261 2.71983 10.5261L2.71143 10.5345Z" fill="black"/>
 <path d="M4.65883 12.0958C4.57489 12.0958 4.49095 12.0706 4.42379 12.0202C4.23072 11.8859 4.18874 11.6257 4.31466 11.4326L8.66298 5.16195C8.79729 4.96888 9.05753 4.9269 9.2506 5.05282C9.44368 5.18713 9.48565 5.44737 9.35974 5.64044L5.01139 11.9111C4.92744 12.0286 4.80152 12.0958 4.66721 12.0958H4.65883Z" fill="black"/>
 </svg>`;
-}
-  if (kind === "pot") {
-    return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <rect x="5" y="9" width="14" height="10" rx="2" fill="#FFD24A" stroke="#111" stroke-width="2"/>
-      <path d="M8 9V7h8v2" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <circle cx="12" cy="6" r="2" fill="#00D6D6" stroke="#111" stroke-width="2"/>
-    </svg>`;
+  }
 
   if (kind === "pot") { // Eldunartími
     return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1254,13 +1242,7 @@ function iconSvg(kind) {
 </clipPath>
 </defs>
 </svg>`;
-}
-  // chef
-  return `<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 20v-5h8v5" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <path d="M7 10c-1.7 0-3-1.3-3-3s1.3-3 3-3c.6-1.2 1.9-2 3.5-2 1 0 2 .3 2.7 1 1.6-.7 3.8.1 3.8 2 1.7 0 3 1.3 3 3s-1.3 3-3 3H7z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M6 21h12" stroke="#00D6D6" stroke-width="4" stroke-linecap="round"/>
-  </svg>`;
+  }
 
   // "chef" => Samtals
   return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
