@@ -802,8 +802,8 @@ function buildCardHtml(p) {
         ">${escapeHtml(p.priceOld)}</span>`
     : "";
 
-  return `
-<div style="
+return `
+<div id="recipe-card" style="
   width:${CARD_W}px;
   height:${CARD_H}px;
   border:1px solid #D9D9D9;
@@ -1038,19 +1038,20 @@ copyBtnRecipe.addEventListener("click", async () => {
 });
 
 downloadPngBtnRecipe.addEventListener("click", async () => {
-  const node = previewRecipeEl.firstElementChild;
-  if (!node) return setStatusRecipe("Engin kort til að sækja. Búðu fyrst til kort.", true);
+const node = document.getElementById("recipe-card");
+if (!node) return setStatusRecipe("Engin kort til að sækja. Búðu fyrst til kort.", true);
+
 
   setStatusRecipe("Bý til PNG…", false);
 
   try {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-    const canvas = await html2canvas(node, {
-      backgroundColor: null,
-      scale: 1,
-      useCORS: true
-    });
+const canvas = await html2canvas(node, {
+  backgroundColor: "#ffffff",
+  scale: 1,
+  useCORS: true
+});
 
     // Rounded corner mask (matches card radius)
     const w = canvas.width, h = canvas.height;
@@ -1272,6 +1273,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
