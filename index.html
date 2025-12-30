@@ -803,27 +803,74 @@ function buildCardHtml(p) {
   const CARD_H = 479;
 
   const PADDING = 40;
-  const GAP_AFTER_IMAGE = 12;
   const IMAGE_AREA_HEIGHT = 255;
 
-  // ✅ tweaks
-  const PRICE_FONT_SIZE = 26;     // was 22
-  const OLD_PRICE_FONT_SIZE = 15; // was 14
-  const INFO_ICON_SIZE = 28;      // smaller than before (was ~33 with 42px svg)
+  // Tweak: bigger price, smaller icon
+  const PRICE_FONT_SIZE = 26;
+  const OLD_PRICE_FONT_SIZE = 15;
+  const INFO_ICON_SIZE = 28;
 
   const imgSrc = IMG_PROXY_URL + encodeURIComponent(p.image);
-  const hasDiscount = !!(p.priceOld && p.priceNew);
-  const newPriceText = hasDiscount ? p.priceNew : p.price;
 
-  const oldPriceHtml = hasDiscount
-    ? `<span style="
+  const priceOld = (p.priceOld || "").trim();
+  const priceNew = (p.priceNew || "").trim();
+  const discountPct = (p.discountPct || "").toString().trim();
+
+  // ✅ more robust discount detection
+  const hasDiscount =
+    (priceOld && priceNew && priceOld !== priceNew) ||
+    (!!discountPct && discountPct !== "0");
+
+  const newPriceText = hasDiscount ? (priceNew || p.price) : p.price;
+
+  const discountBadgeHtml = (hasDiscount && discountPct)
+    ? `<div style="
+          position:absolute;
+          left:16px;
+          top:16px;
+          background:#111;
+          color:#fff;
+          font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+          font-weight:800;
+          font-size:12px;
+          padding:6px 10px;
+          border-radius:999px;
+          line-height:1;
+        ">-${escapeHtml(discountPct)}%</div>`
+    : "";
+
+  const priceHtml = hasDiscount
+    ? `
+      <div style="display:flex; align-items:baseline; gap:10px; line-height:1.1;">
+        <span style="
           font-family:'Basic Sans', Arial, sans-serif;
           font-size:${OLD_PRICE_FONT_SIZE}px;
           font-weight:600;
           color:#787878;
           text-decoration:line-through;
-        ">${escapeHtml(p.priceOld)}</span>`
-    : "";
+          white-space:nowrap;
+        ">${escapeHtml(priceOld)}</span>
+
+        <span style="
+          font-family:'Basic Sans', Arial, sans-serif;
+          font-size:${PRICE_FONT_SIZE}px;
+          font-weight:600;
+          color:#787878;
+          white-space:nowrap;
+        ">${escapeHtml(newPriceText)}</span>
+      </div>
+    `
+    : `
+      <div style="display:flex; align-items:baseline; gap:10px; line-height:1.1;">
+        <span style="
+          font-family:'Basic Sans', Arial, sans-serif;
+          font-size:${PRICE_FONT_SIZE}px;
+          font-weight:600;
+          color:#787878;
+          white-space:nowrap;
+        ">${escapeHtml(newPriceText)}</span>
+      </div>
+    `;
 
   return `
 <div id="product-card" style="
@@ -838,7 +885,10 @@ function buildCardHtml(p) {
   padding:${PADDING}px;
   display:flex;
   flex-direction:column;
+  position:relative;
 ">
+
+  ${discountBadgeHtml}
 
   <!-- Image area -->
   <div style="
@@ -847,34 +897,25 @@ function buildCardHtml(p) {
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    margin-bottom:${GAP_AFTER_IMAGE}px;
     margin-top:22px;
+    margin-bottom:12px;
   ">
     <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
-         style="
-           max-width:100%;
-           max-height:100%;
-           object-fit:contain;
-           display:block;
-           border:0;
-         " />
+      style="max-width:100%; max-height:100%; object-fit:contain; display:block; border:0;" />
   </div>
 
-  <!-- Text pinned to bottom -->
   <div style="margin-top:auto;">
     <div style="
-      font-family:'Basic Sans', Arial, sans-serif;
       font-size:28px;
       font-weight:700;
       line-height:1.2;
-      color:#111111;
+      color:#111;
       margin:0 0 18px 0;
       word-break:break-word;
     ">
       ${escapeHtml(p.name)}
     </div>
 
-    <!-- ✅ price row: baseline for prices, centered icon -->
     <div style="
       display:flex;
       align-items:center;
@@ -882,27 +923,8 @@ function buildCardHtml(p) {
       gap:14px;
       margin-bottom:18px;
     ">
-      <!-- Price group (baseline aligned) -->
-      <div style="
-        display:flex;
-        align-items:baseline;
-        gap:10px;
-        line-height:1.1;
-        min-width:0;
-      ">
-        ${oldPriceHtml}
-        <span style="
-          font-family:'Basic Sans', Arial, sans-serif;
-          font-size:${PRICE_FONT_SIZE}px;
-          font-weight:600;
-          color:#787878;
-          white-space:nowrap;
-        ">
-          ${escapeHtml(newPriceText)}
-        </span>
-      </div>
+      ${priceHtml}
 
-      <!-- Info icon (smaller + centered) -->
       <div style="
         width:${INFO_ICON_SIZE}px;
         height:${INFO_ICON_SIZE}px;
@@ -921,12 +943,8 @@ function buildCardHtml(p) {
             </g>
           </g>
           <defs>
-            <clipPath id="clip0_10192_6996">
-              <rect width="17.0201" height="17.0201" fill="white"/>
-            </clipPath>
-            <clipPath id="clip1_10192_6996">
-              <rect width="15.7117" height="15.7117" fill="white" transform="translate(0.690918 0.563782)"/>
-            </clipPath>
+            <clipPath id="clip0_10192_6996"><rect width="17.0201" height="17.0201" fill="white"/></clipPath>
+            <clipPath id="clip1_10192_6996"><rect width="15.7117" height="15.7117" fill="white" transform="translate(0.690918 0.563782)"/></clipPath>
           </defs>
         </svg>
       </div>
@@ -1330,6 +1348,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
