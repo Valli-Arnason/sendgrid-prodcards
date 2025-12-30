@@ -94,6 +94,7 @@
     <button class="tab-btn" data-tab="tab-card">Create card from url</button>
     <button class="tab-btn" data-tab="tab-2recipes">2-column recipes</button>
     <button class="tab-btn" data-tab="tab-recipe-card">Create recipe card</button>
+    <button class="tab-btn" data-tab="tab-compress">Compress img</button>
   </div>
 
   <!-- ===================== TAB 1: 3-column generator ===================== -->
@@ -912,6 +913,32 @@ function setStatusCard(msg, isError){
   statusCardEl.style.color = isError ? "#b00020" : "#333";
 }
 
+<section id="tab-compress" class="tab">
+  <div class="panel" style="max-width:720px;">
+    <h2>Compress img</h2>
+    <p class="muted" style="margin-bottom:12px;">
+      Opnar TinyPNG í nýjum glugga.
+    </p>
+
+    <div class="btns">
+      <a href="https://tinypng.com/" target="_blank" rel="noopener noreferrer"
+         style="
+           display:inline-block;
+           padding:8px 12px;
+           border-radius:8px;
+           border:1px solid #111;
+           background:#111;
+           color:#fff;
+           font-weight:700;
+           text-decoration:none;
+         ">
+        Open TinyPNG ↗
+      </a>
+    </div>
+  </div>
+</section>
+
+  
 /* ===================== Helpers ===================== */
 function escapeHtml(str) {
   return String(str)
@@ -1284,6 +1311,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
