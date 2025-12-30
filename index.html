@@ -829,86 +829,87 @@ function buildCardHtml(p) {
   flex-direction:column;
 ">
 
-<div style="
-  height:${IMAGE_AREA_HEIGHT}px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  margin-bottom:${GAP_AFTER_IMAGE}px;
-  margin-top:22px;
-">
-  <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
-       style="
-         max-width:100%;
-         max-height:100%;
-         object-fit:contain;
-         display:block;
-         border:0;
-       " />
-</div>
-
-<div style="margin-top:auto;">
   <div style="
-    font-family:'Basic Sans', Arial, sans-serif;
-    font-size:28px;
-    font-weight:700;
-    line-height:1.2;
-    color:#111111;
-    margin:0 0 22px 0;
-    word-break:break-word;
+    height:${IMAGE_AREA_HEIGHT}px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    margin-bottom:${GAP_AFTER_IMAGE}px;
+    margin-top:22px;
   ">
-    ${escapeHtml(p.name)}
+    <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
+         style="
+           max-width:100%;
+           max-height:100%;
+           object-fit:contain;
+           display:block;
+           border:0;
+         " />
   </div>
 
-  <div style="
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:22px;
-  ">
-    <div style="line-height:1.2;">
-      ${oldPriceHtml}
-      <span style="
-        font-family:'Basic Sans', Arial, sans-serif;
-        font-size:${PRICE_FONT_SIZE}px;
-        font-weight:500;
-        color:#787878;
-      ">
-        ${escapeHtml(newPriceText)}
-      </span>
+  <div style="margin-top:auto;">
+    <div style="
+      font-family:'Basic Sans', Arial, sans-serif;
+      font-size:28px;
+      font-weight:700;
+      line-height:1.2;
+      color:#111111;
+      margin:0 0 22px 0;
+      word-break:break-word;
+    ">
+      ${escapeHtml(p.name)}
     </div>
 
     <div style="
-      width:${INFO_ICON_SIZE}px;
-      height:${INFO_ICON_SIZE}px;
-      flex:0 0 ${INFO_ICON_SIZE}px;
       display:flex;
-      align-items:center;
-      justify-content:center;
-    " aria-label="Info">
-      <svg width="42" height="42" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g clip-path="url(#clip0_10192_6996)">
-          <g clip-path="url(#clip1_10192_6996)">
-            <path d="M1.25488 8.98862C1.55273 12.765 4.70145 15.7328 8.55225 15.7328C9.88194 15.7328 11.1159 15.3712 12.1903 14.7542C11.7116 11.031 8.54161 8.15889 4.68018 8.15889C3.44622 8.15889 2.28673 8.45674 1.25488 8.98862Z" fill="#03FFFF"/>
-            <path d="M8.54143 16.2755C4.21195 16.2755 0.690918 12.7438 0.690918 8.4143C0.690918 4.08481 4.21195 0.563782 8.54143 0.563782C12.8709 0.563782 16.392 4.08481 16.392 8.4143C16.392 12.7438 12.8709 16.2648 8.54143 16.2648V16.2755ZM8.54143 1.62754C4.79701 1.62754 1.75467 4.66988 1.75467 8.4143C1.75467 12.1587 4.79701 15.2011 8.54143 15.2011C12.2859 15.2011 15.3282 12.1587 15.3282 8.4143C15.3282 4.66988 12.2859 1.62754 8.54143 1.62754Z" fill="black"/>
-            <path d="M8.5414 12.7332C8.24355 12.7332 8.00952 12.4991 8.00952 12.2013V8.03136C8.00952 7.73351 8.24355 7.49948 8.5414 7.49948C8.83925 7.49948 9.07328 7.73351 9.07328 8.03136V12.2013C9.07328 12.4991 8.83925 12.7332 8.5414 12.7332Z" fill="black"/>
-            <path d="M8.54136 5.80811C8.86449 5.80811 9.12643 5.54617 9.12643 5.22304C9.12643 4.89992 8.86449 4.63798 8.54136 4.63798C8.21824 4.63798 7.9563 4.89992 7.9563 5.22304C7.9563 5.54617 8.21824 5.80811 8.54136 5.80811Z" fill="black"/>
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:22px;
+    ">
+      <div style="line-height:1.2;">
+        ${oldPriceHtml}
+        <span style="
+          font-family:'Basic Sans', Arial, sans-serif;
+          font-size:${PRICE_FONT_SIZE}px;
+          font-weight:500;
+          color:#787878;
+        ">
+          ${escapeHtml(newPriceText)}
+        </span>
+      </div>
+
+      <div style="
+        width:${INFO_ICON_SIZE}px;
+        height:${INFO_ICON_SIZE}px;
+        flex:0 0 ${INFO_ICON_SIZE}px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      " aria-label="Info">
+        <svg width="42" height="42" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0_10192_6996)">
+            <g clip-path="url(#clip1_10192_6996)">
+              <path d="M1.25488 8.98862C1.55273 12.765 4.70145 15.7328 8.55225 15.7328C9.88194 15.7328 11.1159 15.3712 12.1903 14.7542C11.7116 11.031 8.54161 8.15889 4.68018 8.15889C3.44622 8.15889 2.28673 8.45674 1.25488 8.98862Z" fill="#03FFFF"/>
+              <path d="M8.54143 16.2755C4.21195 16.2755 0.690918 12.7438 0.690918 8.4143C0.690918 4.08481 4.21195 0.563782 8.54143 0.563782C12.8709 0.563782 16.392 4.08481 16.392 8.4143C16.392 12.7438 12.8709 16.2648 8.54143 16.2648V16.2755ZM8.54143 1.62754C4.79701 1.62754 1.75467 4.66988 1.75467 8.4143C1.75467 12.1587 4.79701 15.2011 8.54143 15.2011C12.2859 15.2011 15.3282 12.1587 15.3282 8.4143C15.3282 4.66988 12.2859 1.62754 8.54143 1.62754Z" fill="black"/>
+              <path d="M8.5414 12.7332C8.24355 12.7332 8.00952 12.4991 8.00952 12.2013V8.03136C8.00952 7.73351 8.24355 7.49948 8.5414 7.49948C8.83925 7.49948 9.07328 7.73351 9.07328 8.03136V12.2013C9.07328 12.4991 8.83925 12.7332 8.5414 12.7332Z" fill="black"/>
+              <path d="M8.54136 5.80811C8.86449 5.80811 9.12643 5.54617 9.12643 5.22304C9.12643 4.89992 8.86449 4.63798 8.54136 4.63798C8.21824 4.63798 7.9563 4.89992 7.9563 5.22304C7.9563 5.54617 8.21824 5.80811 8.54136 5.80811Z" fill="black"/>
+            </g>
           </g>
-        </g>
-        <defs>
-          <clipPath id="clip0_10192_6996">
-            <rect width="17.0201" height="17.0201" fill="white"/>
-          </clipPath>
-          <clipPath id="clip1_10192_6996">
-            <rect width="15.7117" height="15.7117" fill="white" transform="translate(0.690918 0.563782)"/>
-          </clipPath>
-        </defs>
-      </svg>
+          <defs>
+            <clipPath id="clip0_10192_6996">
+              <rect width="17.0201" height="17.0201" fill="white"/>
+            </clipPath>
+            <clipPath id="clip1_10192_6996">
+              <rect width="15.7117" height="15.7117" fill="white" transform="translate(0.690918 0.563782)"/>
+            </clipPath>
+          </defs>
+        </svg>
+      </div>
     </div>
-  </div>
-</div>
+  </div>  <!-- ✅ closes margin-top:auto -->
+</div>    <!-- ✅ closes #product-card -->
 `.trim();
 }
 
@@ -1158,40 +1159,41 @@ function buildRecipeCardHtml(d) {
       border:0;
     "/>
 
-<div class="likes-pill" style="
-  position:absolute;
-  left:16px;
-  top:16px;
-  border-radius:12px;
-  padding:8px 12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.12);
-  font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-weight:700;
-  color:#111;
-  -webkit-print-color-adjust:exact;
-  print-color-adjust:exact;
-  isolation:isolate;
-">
-  <!-- solid background layer -->
-  <div class="pill-bg" style="
-    position:absolute;
-    inset:0;
-    background:#ffffff;
-    background-color:#ffffff;
-    background-image:none;
-    border-radius:12px;
-    z-index:0;
-  "></div>
+    <div class="likes-pill" style="
+      position:absolute;
+      left:16px;
+      top:16px;
+      border-radius:12px;
+      padding:8px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.12);
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-weight:700;
+      color:#111;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+      isolation:isolate;
+    ">
+      <!-- solid background layer -->
+      <div class="pill-bg" style="
+        position:absolute;
+        inset:0;
+        background:#ffffff;
+        background-color:#ffffff;
+        background-image:none;
+        border-radius:12px;
+        z-index:0;
+      "></div>
 
-  <!-- content above bg -->
-  <svg style="position:relative; z-index:1;" width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
-  </svg>
-  <span style="position:relative; z-index:1;">${escapeHtml(likes)}</span>
-</div>
+      <!-- content above bg -->
+      <svg style="position:relative; z-index:1;" width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
+      </svg>
+      <span style="position:relative; z-index:1;">${escapeHtml(likes)}</span>
+    </div>
+  </div> <!-- ✅ CLOSES the 300px image area -->
 
   <div style="
     height:calc(${CARD_H}px - 300px);
@@ -1304,4 +1306,5 @@ update3col();
 </script>
 </body>
 </html>
+
 
