@@ -789,73 +789,168 @@ downloadPngBtnCard.addEventListener("click", async () => {
   }
 });
 
+function parsePriceNumber(priceStr) {
+  // "1.299 kr." / "1299 kr" / "1,299 kr." -> 1299
+  const m = String(priceStr || "").match(/(\d[\d\.\,]*)/);
+  if (!m) return null;
+  const n = m[1].replace(/\./g, "").replace(/,/g, ".");
+  const v = Number(n);
+  return Number.isFinite(v) ? v : null;
+}
+
 function buildCardHtml(p) {
   const CARD_W = 420;
   const CARD_H = 479;
 
-  const PADDING = 40;
-  const GAP_AFTER_IMAGE = 12;
-  const IMAGE_AREA_HEIGHT = 255;
-  const PRICE_FONT_SIZE = 22;
-  const INFO_ICON_SIZE = Math.round(PRICE_FONT_SIZE * 1.5);
+  const BORDER = "#D9D9D9";
+  const RADIUS = 32;
+
+  const PURPLE = "#8E187C";
+  const GRAY = "#787878";
+  const BLACK = "#111111";
 
   const imgSrc = IMG_PROXY_URL + encodeURIComponent(p.image);
+
   const hasDiscount = !!(p.priceOld && p.priceNew);
-  const newPriceText = hasDiscount ? p.priceNew : p.price;
+  const oldNum = hasDiscount ? parsePriceNumber(p.priceOld) : null;
+  const newNum = hasDiscount ? parsePriceNumber(p.priceNew) : null;
+
+  // Reikna % ef hægt er
+  const pct =
+    hasDiscount && oldNum && newNum && oldNum > 0
+      ? Math.round((1 - newNum / oldNum) * 100)
+      : null;
 
   const oldPriceHtml = hasDiscount
-    ? `<span style="
+    ? `<div style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:18px;
+        font-weight:600;
+        color:${GRAY};
+        text-decoration:line-through;
+        line-height:1.1;
+        margin-bottom:6px;
+      ">${escapeHtml(p.priceOld)}</div>`
+    : "";
+
+  const priceHtml = hasDiscount
+    ? `<div style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:22px;
+        font-weight:700;
+        color:${PURPLE};
+        line-height:1.1;
+      ">${escapeHtml(p.priceNew)}</div>`
+    : `<div style="
+        font-family:'Basic Sans', Arial, sans-serif;
+        font-size:22px;
+        font-weight:500;
+        color:${GRAY};
+        line-height:1.1;
+      ">${escapeHtml(p.price)}</div>`;
+
+  const discountHeader = hasDiscount
+    ? `
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Badge -->
+        <div style="width:54px; height:54px; position:relative; flex:0 0 54px;">
+          <svg width="54" height="54" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;">
+            <circle cx="27" cy="27" r="27" fill="#FFE800"/>
+            <!-- simple % mark -->
+            <circle cx="20.5" cy="21" r="3.2" fill="#111"/>
+            <circle cx="33.5" cy="33" r="3.2" fill="#111"/>
+            <path d="M18 36 L36 18" stroke="#111" stroke-width="3.2" stroke-linecap="round"/>
+            <!-- small accent -->
+            <path d="M40 13c2 2 4 3 6 3" stroke="#00C6CC" stroke-width="3" stroke-linecap="round"/>
+            <path d="M10 41c2-2 4-3 6-3" stroke="#00C6CC" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- % text -->
+        <div style="
           font-family:'Basic Sans', Arial, sans-serif;
-          font-size:14px;
-          font-weight:600;
-          color:#787878;
-          text-decoration:line-through;
-          margin-right:10px;
-        ">${escapeHtml(p.priceOld)}</span>`
+          font-size:32px;
+          font-weight:700;
+          color:${PURPLE};
+          line-height:1;
+          transform: translateY(1px);
+        ">
+          ${pct !== null ? `${pct}%` : ""}
+        </div>
+      </div>
+    `
     : "";
 
   return `
 <div id="product-card" style="
   width:${CARD_W}px;
   height:${CARD_H}px;
-  border:1px solid #D9D9D9;
-  border-radius:8px;
+  border:1px solid ${BORDER};
+  border-radius:${RADIUS}px;
   overflow:hidden;
   background:#ffffff;
   box-sizing:border-box;
   font-family:'Basic Sans', Arial, sans-serif;
-  padding:${PADDING}px;
+  padding:34px;
   display:flex;
   flex-direction:column;
+  gap:14px;
 ">
 
-  <div style="
-    height:${IMAGE_AREA_HEIGHT}px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    margin-bottom:${GAP_AFTER_IMAGE}px;
-    margin-top:22px;
-  ">
-    <img src="${imgSrc}" alt="${escapeHtml(p.name)}"
-         style="
-           max-width:100%;
-           max-height:100%;
-           object-fit:contain;
-           display:block;
-           border:0;
-         " />
-  </div>
+  <!-- TOP AREA -->
+  ${
+    hasDiscount
+      ? `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+          ${discountHeader}
 
+          <div style="
+            width:200px;
+            height:210px;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            overflow:hidden;
+          ">
+            <img src="${imgSrc}" alt="${escapeHtml(p.name)}" style="
+              width:100%;
+              height:100%;
+              object-fit:contain;
+              display:block;
+              border:0;
+            " />
+          </div>
+        </div>
+      `
+      : `
+        <div style="
+          height:260px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          overflow:hidden;
+          margin-top:6px;
+        ">
+          <img src="${imgSrc}" alt="${escapeHtml(p.name)}" style="
+            max-width:100%;
+            max-height:100%;
+            object-fit:contain;
+            display:block;
+            border:0;
+          " />
+        </div>
+      `
+  }
+
+  <!-- BOTTOM AREA -->
   <div style="margin-top:auto;">
     <div style="
       font-family:'Basic Sans', Arial, sans-serif;
-      font-size:28px;
+      font-size:32px;
       font-weight:700;
-      line-height:1.2;
-      color:#111111;
-      margin:0 0 22px 0;
+      line-height:1.15;
+      color:${BLACK};
+      margin:0 0 18px 0;
       word-break:break-word;
     ">
       ${escapeHtml(p.name)}
@@ -866,29 +961,22 @@ function buildCardHtml(p) {
       align-items:flex-end;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:22px;
     ">
-      <div style="line-height:1.2;">
+      <div>
         ${oldPriceHtml}
-        <span style="
-          font-family:'Basic Sans', Arial, sans-serif;
-          font-size:${PRICE_FONT_SIZE}px;
-          font-weight:500;
-          color:#787878;
-        ">
-          ${escapeHtml(newPriceText)}
-        </span>
+        ${priceHtml}
       </div>
 
+      <!-- Info icon -->
       <div style="
-        width:${INFO_ICON_SIZE}px;
-        height:${INFO_ICON_SIZE}px;
-        flex:0 0 ${INFO_ICON_SIZE}px;
+        width:52px;
+        height:52px;
+        flex:0 0 52px;
         display:flex;
         align-items:center;
         justify-content:center;
       " aria-label="Info">
-        <svg width="42" height="42" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="52" height="52" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_10192_6996)">
             <g clip-path="url(#clip1_10192_6996)">
               <path d="M1.25488 8.98862C1.55273 12.765 4.70145 15.7328 8.55225 15.7328C9.88194 15.7328 11.1159 15.3712 12.1903 14.7542C11.7116 11.031 8.54161 8.15889 4.68018 8.15889C3.44622 8.15889 2.28673 8.45674 1.25488 8.98862Z" fill="#03FFFF"/>
@@ -908,8 +996,8 @@ function buildCardHtml(p) {
         </svg>
       </div>
     </div>
-  </div>  <!-- ✅ closes margin-top:auto -->
-</div>    <!-- ✅ closes #product-card -->
+  </div>
+</div>
 `.trim();
 }
 
@@ -1306,5 +1394,6 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
