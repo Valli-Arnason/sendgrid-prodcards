@@ -633,10 +633,15 @@ update2recipes();
 
 /* ===================== TAB 2: Card builder ===================== */
 /* EDIT THIS if your Worker URL changes */
-const WORKER_BASE = "https://product-parser.thorvaldura.workers.dev";
-const PROXY_URL = `${WORKER_BASE}/?url=`;
-const IMG_PROXY_URL = `${WORKER_BASE}/img?url=`;
-const RECIPE_PROXY_URL = `${WORKER_BASE}/recipe?url=`;
+/* ===================== Proxies ===================== */
+const PRODUCT_WORKER_BASE = "https://product-parser.thorvaldura.workers.dev";
+const RECIPE_WORKER_BASE  = "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev"; 
+// ^ eða hvaða worker sem þú veist að recipe endpointið virkar á
+
+const PROXY_URL        = `${PRODUCT_WORKER_BASE}/?url=`;
+const IMG_PROXY_URL    = `${PRODUCT_WORKER_BASE}/img?url=`;
+const RECIPE_PROXY_URL = `${RECIPE_WORKER_BASE}/recipe?url=`;
+
 
 const productUrlCardEl = document.getElementById("productUrlCard");
 const createBtnCard = document.getElementById("createBtnCard");
@@ -1352,6 +1357,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
