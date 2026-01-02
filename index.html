@@ -830,14 +830,14 @@ function buildCardHtml(p) {
   const discountBadgeHtml = (hasDiscount && discountPct)
     ? `<div style="
           position:absolute;
-          left:16px;
+          left:${PADDING}px;
           top:16px;
           background:#111;
           color:#fff;
           font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
           font-weight:800;
-          font-size:12px;
-          padding:6px 10px;
+          font-size:16px;
+          padding:8px 14px;
           border-radius:999px;
           line-height:1;
         ">-${escapeHtml(discountPct)}%</div>`
@@ -1352,6 +1352,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
