@@ -698,9 +698,9 @@ createBtnCard.addEventListener("click", async () => {
 );
 
 
-    if (!data?.name || !data?.price || !data?.image) {
-      throw new Error("Missing fields in JSON");
-    }
+    if (!data?.name || !data?.image || !(data.price || data.priceNew)) {
+    throw new Error("Missing fields in JSON");
+}
 
     lastProductData = data;
 
@@ -1355,6 +1355,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
