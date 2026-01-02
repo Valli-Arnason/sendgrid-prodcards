@@ -690,6 +690,13 @@ createBtnCard.addEventListener("click", async () => {
 
   try {
     const data = await fetch(PROXY_URL + encodeURIComponent(url)).then(r => r.json());
+    console.log("PRODUCT DATA FROM WORKER:", data);
+
+    setStatusCard(
+    `JSON: ${JSON.stringify(data, null, 2)}`,
+    false
+);
+
 
     if (!data?.name || !data?.price || !data?.image) {
       throw new Error("Missing fields in JSON");
@@ -1348,6 +1355,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
