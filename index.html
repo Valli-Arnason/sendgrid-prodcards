@@ -826,9 +826,12 @@ function buildCardHtml(p) {
   const discountPct = (p.discountPct || "").toString().trim();
 
   // ✅ more robust discount detection
-  const hasDiscount =
-    (priceOld && priceNew && priceOld !== priceNew) ||
-    (!!discountPct && discountPct !== "0");
+const oldNum = parsePriceNumber(priceOld);
+const newNum = parsePriceNumber(priceNew || p.price);
+
+const hasDiscount =
+  p.isDiscounted === true ||
+  (Number.isFinite(oldNum) && Number.isFinite(newNum) && oldNum > newNum);
 
   const newPriceText = hasDiscount ? (priceNew || p.price) : p.price;
 
@@ -1357,6 +1360,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
