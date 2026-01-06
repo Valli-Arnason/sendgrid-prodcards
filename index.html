@@ -632,16 +632,13 @@ renderInputs2recipes();
 update2recipes();
 
 /* ===================== TAB 2: Card builder ===================== */
-/* EDIT THIS if your Worker URL changes */
 /* ===================== Proxies ===================== */
 const PRODUCT_WORKER_BASE = "https://product-parser.thorvaldura.workers.dev";
-const RECIPE_WORKER_BASE  = "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev"; 
-// ^ eða hvaða worker sem þú veist að recipe endpointið virkar á
+const RECIPE_WORKER_BASE  = "https://workers-playground-patient-frog-cbe4.thorvaldura.workers.dev";
 
 const PROXY_URL        = `${PRODUCT_WORKER_BASE}/?url=`;
 const IMG_PROXY_URL    = `${PRODUCT_WORKER_BASE}/img?url=`;
 const RECIPE_PROXY_URL = `${RECIPE_WORKER_BASE}/recipe?url=`;
-
 
 const productUrlCardEl = document.getElementById("productUrlCard");
 const createBtnCard = document.getElementById("createBtnCard");
@@ -667,7 +664,17 @@ function getMergedCardData() {
 
   if (priceOverride) {
     merged.price = priceOverride;
-    if (merged.priceNew) merged.priceNew = priceOverride;
+
+    // Keep discount shape consistent
+    if (merged.isDiscounted === true) {
+      merged.priceNew = priceOverride;
+      // keep old/discountPct as-is
+    } else {
+      merged.priceNew = null;
+      merged.priceOld = null;
+      merged.discountPct = null;
+      merged.isDiscounted = false;
+    }
   }
 
   return merged;
@@ -694,15 +701,9 @@ createBtnCard.addEventListener("click", async () => {
     const data = await fetch(PROXY_URL + encodeURIComponent(url)).then(r => r.json());
     console.log("PRODUCT DATA FROM WORKER:", data);
 
-    setStatusCard(
-    `JSON: ${JSON.stringify(data, null, 2)}`,
-    false
-);
-
-
     if (!data?.name || !data?.image || !(data.price || data.priceNew)) {
-    throw new Error("Missing fields in JSON");
-}
+      throw new Error("Missing fields in JSON");
+    }
 
     lastProductData = data;
 
@@ -802,7 +803,7 @@ function parsePriceNumber(priceStr) {
   // "1.299 kr." / "1299 kr" / "1,299 kr." -> 1299
   const m = String(priceStr || "").match(/(\d[\d\.\,]*)/);
   if (!m) return null;
-  const n = m[1].replace(/\./g, "").replace(/,/g, ".");
+  const n = m[1].replace(/\./g, "").replace(/,/g, "");
   const v = Number(n);
   return Number.isFinite(v) ? v : null;
 }
@@ -814,28 +815,31 @@ function buildCardHtml(p) {
   const PADDING = 40;
   const IMAGE_AREA_HEIGHT = 255;
 
-  // Tweak: bigger price, smaller icon
   const PRICE_FONT_SIZE = 26;
   const OLD_PRICE_FONT_SIZE = 15;
   const INFO_ICON_SIZE = 28;
 
   const imgSrc = IMG_PROXY_URL + encodeURIComponent(p.image);
 
-  const priceOld = (p.priceOld || "").trim();
-  const priceNew = (p.priceNew || "").trim();
-  const discountPct = (p.discountPct || "").toString().trim();
+  // Normalize strings
+  const priceOldRaw = (p.priceOld || "").trim();
+  const priceNewRaw = (p.priceNew || p.price || "").trim();
 
+  // Robust discount: must be flagged AND be a real numeric reduction
+  const oldNum = parsePriceNumber(priceOldRaw);
+  const newNum = parsePriceNumber(priceNewRaw);
 
-  // ✅ more robust discount detection
-const oldNum = parsePriceNumber(priceOld);
-const newNum = parsePriceNumber(priceNew || p.price);
+  const hasDiscount =
+    p.isDiscounted === true &&
+    !!priceOldRaw &&
+    !!priceNewRaw &&
+    Number.isFinite(oldNum) &&
+    Number.isFinite(newNum) &&
+    oldNum > newNum;
 
-const hasDiscount =
-  p.isDiscounted === true ||
-  (Number.isFinite(oldNum) && Number.isFinite(newNum) && oldNum > newNum);
+  const discountPct = (hasDiscount ? (p.discountPct || "") : "").toString().trim();
 
-  const newPriceText = hasDiscount ? (priceNew || p.price) : p.price;
-
+  const newPriceText = priceNewRaw; // always use normalized
   const discountBadgeHtml = (hasDiscount && discountPct)
     ? `<div style="
           position:absolute;
@@ -862,7 +866,7 @@ const hasDiscount =
           color:#787878;
           text-decoration:line-through;
           white-space:nowrap;
-        ">${escapeHtml(priceOld)}</span>
+        ">${escapeHtml(priceOldRaw)}</span>
 
         <span style="
           font-family:'Basic Sans', Arial, sans-serif;
@@ -966,7 +970,6 @@ const hasDiscount =
 </div>
 `.trim();
 }
-
 
 function setStatusCard(msg, isError){
   statusCardEl.textContent = msg;
@@ -1110,35 +1113,29 @@ downloadPngBtnRecipe.addEventListener("click", async () => {
       scale: 1,
       useCORS: true,
       onclone: (doc) => {
-  const pill = doc.querySelector("#recipe-card .likes-pill");
-  if (pill) {
-    // Force SOLID white (no transparency, no patterns)
-    pill.style.setProperty("background", "#ffffff", "important");
-    pill.style.setProperty("background-color", "#ffffff", "important");
-    pill.style.setProperty("background-image", "none", "important");
-    pill.style.setProperty("opacity", "1", "important");
-    pill.style.setProperty("filter", "none", "important");
-    pill.style.setProperty("backdrop-filter", "none", "important");
-    pill.style.setProperty("-webkit-backdrop-filter", "none", "important");
+        const pill = doc.querySelector("#recipe-card .likes-pill");
+        if (pill) {
+          pill.style.setProperty("background", "#ffffff", "important");
+          pill.style.setProperty("background-color", "#ffffff", "important");
+          pill.style.setProperty("background-image", "none", "important");
+          pill.style.setProperty("opacity", "1", "important");
+          pill.style.setProperty("filter", "none", "important");
+          pill.style.setProperty("backdrop-filter", "none", "important");
+          pill.style.setProperty("-webkit-backdrop-filter", "none", "important");
+          pill.style.setProperty("mix-blend-mode", "normal", "important");
+          pill.style.setProperty("isolation", "isolate", "important");
+          pill.style.setProperty("border", "1px solid rgba(0,0,0,0.06)", "important");
 
-    // If there is any accidental blending
-    pill.style.setProperty("mix-blend-mode", "normal", "important");
-    pill.style.setProperty("isolation", "isolate", "important");
-
-    // Optional: tiny border helps anti-alias edges
-    pill.style.setProperty("border", "1px solid rgba(0,0,0,0.06)", "important");
-
-    // Bulletproof: ensure we have a dedicated solid background layer
-    const bg = pill.querySelector(".pill-bg");
-    if (bg) {
-      bg.style.setProperty("background", "#ffffff", "important");
-      bg.style.setProperty("background-color", "#ffffff", "important");
-      bg.style.setProperty("background-image", "none", "important");
-      bg.style.setProperty("opacity", "1", "important");
-      bg.style.setProperty("filter", "none", "important");
-    }
-  }
-}
+          const bg = pill.querySelector(".pill-bg");
+          if (bg) {
+            bg.style.setProperty("background", "#ffffff", "important");
+            bg.style.setProperty("background-color", "#ffffff", "important");
+            bg.style.setProperty("background-image", "none", "important");
+            bg.style.setProperty("opacity", "1", "important");
+            bg.style.setProperty("filter", "none", "important");
+          }
+        }
+      }
     });
 
     const w = canvas.width, h = canvas.height;
@@ -1231,7 +1228,6 @@ function buildRecipeCardHtml(d) {
       print-color-adjust:exact;
       isolation:isolate;
     ">
-      <!-- solid background layer -->
       <div class="pill-bg" style="
         position:absolute;
         inset:0;
@@ -1242,13 +1238,12 @@ function buildRecipeCardHtml(d) {
         z-index:0;
       "></div>
 
-      <!-- content above bg -->
       <svg style="position:relative; z-index:1;" width="20" height="18" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M10 17s-7-4.4-9.2-8.6C-1.3 4.2 1.1 0.9 5 1c2 .1 3.3 1.2 5 3 1.7-1.8 3-2.9 5-3 3.9-.1 6.3 3.2 4.2 7.4C17 12.6 10 17 10 17z" fill="#FF4B4B"/>
       </svg>
       <span style="position:relative; z-index:1;">${escapeHtml(likes)}</span>
     </div>
-  </div> <!-- ✅ CLOSES the 300px image area -->
+  </div>
 
   <div style="
     height:calc(${CARD_H}px - 300px);
@@ -1309,6 +1304,7 @@ function metaBlock(label, value, icon) {
 }
 
 function iconSvg(kind) {
+  // (kept as-is from your file)
   if (kind === "whisk") {
     return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11.5088 9.47681H1.92234C0.856242 9.47681 0 10.3414 0 11.3991C0 12.4568 0.864636 13.3215 1.92234 13.3215H11.5088C12.5749 13.3215 13.4311 12.4568 13.4311 11.3991C13.4311 10.3414 12.5665 9.47681 11.5088 9.47681Z" fill="#00C6CC"/>
@@ -1361,22 +1357,3 @@ update3col();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
