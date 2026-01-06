@@ -824,7 +824,6 @@ function buildCardHtml(p) {
   const priceOld = (p.priceOld || "").trim();
   const priceNew = (p.priceNew || "").trim();
   const discountPct = (p.discountPct || "").toString().trim();
-  const hasDiscount = p.isDiscounted === true;
 
 
   // ✅ more robust discount detection
@@ -1362,6 +1361,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
