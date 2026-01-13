@@ -94,6 +94,7 @@
     <button class="tab-btn" data-tab="tab-recipe-card">Create Recipe Card</button>
     <button class="tab-btn active" data-tab="tab-3col">3-Column Product block</button>
     <button class="tab-btn" data-tab="tab-2recipes">2-Column Recipes Block</button>
+    <button class="tab-btn" data-tab="tab-single-recipe">Single recipe</button>
     <button class="tab-btn" data-tab="tab-compress">Compress IMG</button>
   </div>
 
@@ -249,6 +250,64 @@
       </div>
     </div>
   </section>
+  
+  <!-- ===================== TAB: Single recipe ===================== -->
+<section id="tab-single-recipe" class="tab">
+  <div class="wrap">
+    <div class="panel">
+      <h2>Single recipe</h2>
+
+      <label>Fyrirsögn</label>
+      <input id="srTitle" placeholder='t.d. "Halloween spaghetti 🎃"' />
+
+      <label>Texti (valfrjálst: linkaðu með [texti](https://...))</label>
+      <textarea id="srBody" style="min-height:160px;" placeholder="Skrifaðu textann hér..."></textarea>
+      <div class="small">
+        Dæmi: ... allt hráefni í [uppskrift vikunnar](https://kronan.is/uppskriftir/...) á sama stað!
+      </div>
+
+      <div class="row3" style="grid-template-columns:1fr 1fr 160px; margin-top:12px;">
+        <div>
+          <label>CTA texti</label>
+          <input id="srCtaText" value="Grænir mánudagar" />
+        </div>
+        <div>
+          <label>CTA linkur</label>
+          <input id="srCtaHref" value="https://kronan.is/graenir-manudagar" />
+        </div>
+        <div>
+          <label>CTA litur</label>
+          <input id="srCtaBg" type="color" value="#92b945" style="height:40px; padding:6px;" />
+        </div>
+      </div>
+
+      <div class="row3" style="grid-template-columns:1fr 1fr; margin-top:12px;">
+        <div>
+          <label>Mynd linkur (href) (valfrjálst)</label>
+          <input id="srImgHref" placeholder="https://kronan.is/uppskriftir/..." />
+        </div>
+        <div>
+          <label>Mynd URL (src) (SendGrid CDN)</label>
+          <input id="srImgSrc" placeholder="http://cdn.mcauto-images-production.sendgrid.net/.../450x563.jpg" />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="srReset" class="ghost" type="button">Hreinsa</button>
+        <button id="srCopy" type="button">Afrita HTML</button>
+      </div>
+      <div id="srStatus" class="note"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Forskoðun</h2>
+      <div class="preview" id="srPreview"></div>
+
+      <h2 style="margin-top:14px;">Úttak (copy/paste í SendGrid)</h2>
+      <textarea id="srOutput" readonly></textarea>
+    </div>
+  </div>
+</section>
 
   <!-- ===================== TAB: Compress img ===================== -->
   <section id="tab-compress" class="tab">
@@ -1353,12 +1412,181 @@ function iconSvg(kind) {
 </svg>`;
 }
 
+<script>
+/* ===================== TAB: Single recipe ===================== */
+const srTitleEl   = document.getElementById("srTitle");
+const srBodyEl    = document.getElementById("srBody");
+const srCtaTextEl = document.getElementById("srCtaText");
+const srCtaHrefEl = document.getElementById("srCtaHref");
+const srCtaBgEl   = document.getElementById("srCtaBg");
+const srImgHrefEl = document.getElementById("srImgHref");
+const srImgSrcEl  = document.getElementById("srImgSrc");
+
+const srPreviewEl = document.getElementById("srPreview");
+const srOutputEl  = document.getElementById("srOutput");
+const srCopyBtn   = document.getElementById("srCopy");
+const srResetBtn  = document.getElementById("srReset");
+const srStatusEl  = document.getElementById("srStatus");
+
+function setSrStatus(msg, isError=false){
+  srStatusEl.textContent = msg;
+  srStatusEl.style.color = isError ? "#b00020" : "#333";
+}
+
+/**
+ * Very small markdown link support:
+ *  "foo [bar](https://x) baz" -> foo <a href="https://x">bar</a> baz
+ * Everything else is escaped + newlines -> <br>
+ */
+function renderBodyWithLinks(raw) {
+  const s = String(raw || "");
+
+  // Convert markdown links first (we’ll escape around them carefully)
+  // Strategy: split on [text](url) and escape the rest.
+  const parts = [];
+  let last = 0;
+  const re = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+  let m;
+
+  while ((m = re.exec(s))) {
+    const before = s.slice(last, m.index);
+    parts.push({ type: "text", value: before });
+    parts.push({ type: "link", text: m[1], href: m[2] });
+    last = m.index + m[0].length;
+  }
+  parts.push({ type: "text", value: s.slice(last) });
+
+  const html = parts.map(p => {
+    if (p.type === "text") {
+      return escapeHtml(p.value).replace(/\n/g, "<br>");
+    }
+    return `<a href="${escapeHtml(p.href)}" style="text-decoration:none;">${escapeHtml(p.text)}</a>`;
+  }).join("");
+
+  return html;
+}
+
+const SINGLE_RECIPE_TEMPLATE = String.raw`<style type="text/css">
+  @media only screen and (max-width: 600px) {
+    .container { width: 100% !important; }
+    .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+    .stack-column td { display: block !important; width: 100% !important; }
+    .center-on-mobile { text-align: center !important; }
+    .center div { text-align: left !important; }
+  }
+  .img-full {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    display: block;
+    margin: 0 auto;
+    margin-left: 0 !important;
+  }
+</style>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #ffffff; font-family: arial; font-size: 14px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" class="container" cellspacing="0" cellpadding="0" border="0" width="600" style="width: 100%; max-width: 600px;">
+        <tr>
+          <!-- Left Column -->
+          <td class="stack-column" width="50%" style="padding: 12px; max-width: 300px; vertical-align: top; color: #000000;">
+            <h2 style="margin: 0 0 10px 0; font-size: 20px;">{{TITLE}}</h2>
+            <p style="margin: 0 0 20px 0; line-height: 24px; font-size: 14px;">
+              {{BODY}}
+            </p>
+            <div class="center">
+              <div class="center-on-mobile">
+                <a href="{{CTA_HREF}}" style="display: inline-block; padding: 19px 32px; background-color: {{CTA_BG}}; color: #000000; font-weight: 700; text-decoration: none; font-size: 16px; border-radius: 8px;">
+                  {{CTA_TEXT}}
+                </a>
+              </div>
+            </div>
+          </td>
+
+          <!-- Right Column -->
+          <td class="stack-column" width="50%" style="padding: 12px; vertical-align: top; text-align: center;">
+            <a href="{{IMG_HREF}}">
+              <img src="{{IMG_SRC}}" width="200" alt="Thumbnail" style="display: block; width: 100%; max-width: 300px; height: auto; border: 0;" class="img-full">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+
+function buildSingleRecipeHtml() {
+  const title = srTitleEl.value.trim() || "Uppskrift vikunnar";
+  const bodyRaw = srBodyEl.value || "";
+  const bodyHtml = renderBodyWithLinks(bodyRaw);
+
+  const ctaText = srCtaTextEl.value.trim() || "Skoða";
+  const ctaHref = srCtaHrefEl.value.trim() || "#";
+  const ctaBg   = srCtaBgEl.value || "#92b945";
+
+  const imgSrc  = srImgSrcEl.value.trim() || "https://via.placeholder.com/450x563.png?text=Recipe";
+  const imgHref = srImgHrefEl.value.trim() || ctaHref || "#";
+
+  return SINGLE_RECIPE_TEMPLATE
+    .replaceAll("{{TITLE}}", escapeHtml(title))
+    // BODY is already HTML (escaped + <br> + safe <a>)
+    .replaceAll("{{BODY}}", bodyHtml)
+    .replaceAll("{{CTA_TEXT}}", escapeHtml(ctaText))
+    .replaceAll("{{CTA_HREF}}", escapeHtml(ctaHref))
+    .replaceAll("{{CTA_BG}}", escapeHtml(ctaBg))
+    .replaceAll("{{IMG_SRC}}", escapeHtml(imgSrc))
+    .replaceAll("{{IMG_HREF}}", escapeHtml(imgHref))
+    .trim();
+}
+
+function updateSingleRecipe() {
+  if (!srOutputEl || !srPreviewEl) return;
+  const html = buildSingleRecipeHtml();
+  srOutputEl.value = html;
+  srPreviewEl.innerHTML = html;
+}
+
+[srTitleEl, srBodyEl, srCtaTextEl, srCtaHrefEl, srCtaBgEl, srImgHrefEl, srImgSrcEl].forEach(el => {
+  if (!el) return;
+  el.addEventListener("input", updateSingleRecipe);
+});
+
+srCopyBtn?.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(srOutputEl.value);
+    setSrStatus("Afritað! Límdu í SendGrid Code Block ✅");
+    setTimeout(() => setSrStatus(""), 1400);
+  } catch {
+    setSrStatus("Gat ekki afritað — afritaðu handvirkt.", true);
+  }
+});
+
+srResetBtn?.addEventListener("click", () => {
+  srTitleEl.value = "";
+  srBodyEl.value = "";
+  srCtaTextEl.value = "Grænir mánudagar";
+  srCtaHrefEl.value = "https://kronan.is/graenir-manudagar";
+  srCtaBgEl.value = "#92b945";
+  srImgHrefEl.value = "";
+  srImgSrcEl.value = "";
+  updateSingleRecipe();
+  setSrStatus("Hreinsað ✅");
+  setTimeout(() => setSrStatus(""), 1200);
+});
+
+/* Init single recipe */
+updateSingleRecipe();
+</script>
+  
+  
 /* Init 3col tab */
 renderInputs3col();
 update3col();
 </script>
 </body>
 </html>
+
 
 
 
