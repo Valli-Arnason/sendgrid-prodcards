@@ -332,6 +332,286 @@
           Open TinyPNG ↗
         </a>
       </div>
+        <div class="btns">
+        <a href="https://tinypng.com/" target="_blank" rel="noopener noreferrer"
+           style="
+             display:inline-block;
+             padding:8px 12px;
+             border-radius:8px;
+             border:1px solid #111;
+             background:#111;
+             color:#fff;
+             font-weight:700;
+             text-decoration:none;
+           ">
+          Open TinyPNG ↗
+        </a>
+      </div>
+
+      <!-- Single recipe – þjappa mynd (420px) -->
+      <section class="sr-card" id="sr-compress-420">
+        <div class="sr-head">
+          <div>
+            <div class="sr-title">Single recipe – þjappa mynd</div>
+            <div class="sr-sub">
+              Resize í <b>420px</b> breidd (hæð fylgir hlutföllum). JPG/PNG.
+            </div>
+          </div>
+
+          <div class="sr-head-actions">
+            <button class="sr-btn sr-btn-secondary" type="button" id="srPickBtn">Velja mynd</button>
+            <input id="srFileInput" type="file" accept="image/jpeg,image/png" hidden />
+          </div>
+        </div>
+
+        <div class="sr-drop" id="srDrop">
+          <div class="sr-drop-text" id="srDropText">
+            Dragðu mynd hingað eða smelltu til að velja.
+          </div>
+
+          <div class="sr-preview" id="srPreview" hidden>
+            <img id="srImgPreview" alt="preview" />
+            <div class="sr-meta">
+              <div><span>Skrá:</span> <b id="srMetaName"></b></div>
+              <div><span>Tegund:</span> <b id="srMetaType"></b></div>
+              <div><span>Stærð:</span> <b id="srMetaSize"></b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sr-actions">
+          <button class="sr-btn sr-btn-primary" type="button" id="srCompressBtn" disabled>Þjappa</button>
+          <button class="sr-btn sr-btn-secondary" type="button" id="srDownloadBtn" disabled>Download 420px</button>
+          <button class="sr-btn sr-btn-ghost" type="button" id="srClearBtn">Hreinsa</button>
+          <div class="sr-status" id="srStatus" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <style>
+        .sr-card{
+          border:1px solid rgba(0,0,0,.08);
+          border-radius:14px;
+          padding:16px;
+          background:#fff;
+          box-shadow:0 8px 30px rgba(0,0,0,.05);
+          margin-top:14px;
+          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+        .sr-head{
+          display:flex; gap:12px; align-items:center; justify-content:space-between;
+          flex-wrap:wrap; margin-bottom:12px;
+        }
+        .sr-title{font-size:16px; font-weight:800;}
+        .sr-sub{font-size:13px; opacity:.8; margin-top:2px;}
+        .sr-head-actions{display:flex; gap:10px; align-items:center;}
+        .sr-drop{
+          border:2px dashed rgba(0,0,0,.15);
+          border-radius:14px;
+          padding:14px;
+          min-height:140px;
+          cursor:pointer;
+          background:rgba(0,0,0,.015);
+          display:flex; align-items:center; justify-content:center;
+        }
+        .sr-drop-text{font-size:14px; opacity:.75; text-align:center;}
+        .sr-preview{
+          display:grid;
+          grid-template-columns:120px 1fr;
+          gap:12px;
+          width:100%;
+          align-items:center;
+        }
+        .sr-preview img{
+          width:120px; height:120px; object-fit:cover;
+          border-radius:12px; border:1px solid rgba(0,0,0,.08);
+          background:#fff;
+        }
+        .sr-meta{font-size:13px; opacity:.9;}
+        .sr-meta span{font-weight:600; opacity:.8;}
+        .sr-actions{
+          display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px;
+        }
+        .sr-btn{
+          border:none; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer;
+        }
+        .sr-btn-primary{background:#000; color:#fff;}
+        .sr-btn-secondary{background:#fff; border:1px solid rgba(0,0,0,.15); font-weight:700;}
+        .sr-btn-ghost{background:transparent; text-decoration:underline; opacity:.75; padding:10px 10px;}
+        .sr-btn:disabled{opacity:.5; cursor:not-allowed;}
+        .sr-status{font-size:13px; opacity:.8; margin-left:auto;}
+      </style>
+
+      <script>
+      (() => {
+        const TARGET_WIDTH = 420;
+
+        const pickBtn = document.getElementById("srPickBtn");
+        const fileInput = document.getElementById("srFileInput");
+        const drop = document.getElementById("srDrop");
+        const dropText = document.getElementById("srDropText");
+
+        const preview = document.getElementById("srPreview");
+        const imgPreview = document.getElementById("srImgPreview");
+        const metaName = document.getElementById("srMetaName");
+        const metaType = document.getElementById("srMetaType");
+        const metaSize = document.getElementById("srMetaSize");
+
+        const compressBtn = document.getElementById("srCompressBtn");
+        const downloadBtn = document.getElementById("srDownloadBtn");
+        const clearBtn = document.getElementById("srClearBtn");
+        const statusEl = document.getElementById("srStatus");
+
+        let file = null;
+        let previewUrl = "";
+        let outputUrl = "";
+        let outputName = "";
+        let outputBlob = null;
+
+        function setStatus(msg){ statusEl.textContent = msg || ""; }
+        function revoke(url){ try { if (url) URL.revokeObjectURL(url); } catch(e){} }
+
+        function formatBytes(bytes){
+          if (!bytes) return "0 B";
+          const k = 1024;
+          const sizes = ["B","KB","MB","GB"];
+          const i = Math.floor(Math.log(bytes)/Math.log(k));
+          const val = bytes/Math.pow(k,i);
+          return (val.toFixed(val >= 10 ? 0 : 1) + " " + sizes[i]);
+        }
+
+        function stripExt(name){ return name.replace(/\.(png|jpg|jpeg)$/i, ""); }
+
+        function resetOutput(){
+          revoke(outputUrl);
+          outputUrl = "";
+          outputName = "";
+          outputBlob = null;
+          downloadBtn.disabled = true;
+        }
+
+        function setFile(newFile){
+          resetOutput();
+          setStatus("");
+
+          file = null;
+          compressBtn.disabled = true;
+
+          if (!newFile){
+            revoke(previewUrl);
+            previewUrl = "";
+            imgPreview.src = "";
+            preview.hidden = true;
+            dropText.hidden = false;
+            return;
+          }
+
+          const ok = (newFile.type === "image/jpeg" || newFile.type === "image/png");
+          if (!ok){
+            setStatus("Vinsamlegast veldu JPG eða PNG.");
+            return;
+          }
+
+          file = newFile;
+          compressBtn.disabled = false;
+
+          revoke(previewUrl);
+          previewUrl = URL.createObjectURL(file);
+
+          imgPreview.src = previewUrl;
+          metaName.textContent = file.name;
+          metaType.textContent = file.type;
+          metaSize.textContent = formatBytes(file.size);
+
+          preview.hidden = false;
+          dropText.hidden = true;
+        }
+
+        async function loadImageFromFile(f){
+          return new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(f);
+            const img = new Image();
+            img.onload = () => { revoke(url); resolve(img); };
+            img.onerror = () => { revoke(url); reject(new Error("Gat ekki lesið mynd.")); };
+            img.src = url;
+          });
+        }
+
+        function canvasToBlob(canvas, type, quality){
+          return new Promise((resolve) => {
+            canvas.toBlob((blob) => resolve(blob), type, type === "image/jpeg" ? quality : undefined);
+          });
+        }
+
+        async function compress(){
+          if (!file) return;
+
+          try{
+            setStatus("Þjappa...");
+            resetOutput();
+
+            const img = await loadImageFromFile(file);
+
+            const scale = TARGET_WIDTH / img.width;
+            const w = TARGET_WIDTH;
+            const h = Math.round(img.height * scale);
+
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) throw new Error("Canvas context ekki til staðar.");
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const isPng = file.type === "image/png";
+            const outType = isPng ? "image/png" : "image/jpeg";
+            const quality = 0.82;
+
+            const blob = await canvasToBlob(canvas, outType, quality);
+            if (!blob) throw new Error("Tókst ekki að búa til útgáfu.");
+
+            outputBlob = blob;
+            outputName = stripExt(file.name) + "-420w." + (isPng ? "png" : "jpg");
+            outputUrl = URL.createObjectURL(blob);
+
+            downloadBtn.disabled = false;
+            setStatus("Tilbúið: " + w + "×" + h + "px");
+          } catch(err){
+            setStatus("Villa: " + (err && err.message ? err.message : "óþekkt"));
+          }
+        }
+
+        function download(){
+          if (!outputUrl || !outputBlob) return;
+          const a = document.createElement("a");
+          a.href = outputUrl;
+          a.download = outputName || "single-recipe-420w";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+
+        // Events
+        pickBtn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", (e) => setFile(e.target.files && e.target.files[0]));
+
+        drop.addEventListener("click", () => fileInput.click());
+        drop.addEventListener("dragover", (e) => { e.preventDefault(); e.stopPropagation(); });
+        drop.addEventListener("drop", (e) => {
+          e.preventDefault(); e.stopPropagation();
+          const f = e.dataTransfer.files && e.dataTransfer.files[0];
+          setFile(f);
+        });
+
+        compressBtn.addEventListener("click", compress);
+        downloadBtn.addEventListener("click", download);
+        clearBtn.addEventListener("click", () => setFile(null));
+      })();
+      </script>
+
     </div>
   </section>
 
@@ -1583,6 +1863,7 @@ update3col();
 </script>
 </body>
 </html>
+
 
 
 
